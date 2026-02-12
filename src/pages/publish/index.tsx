@@ -1,4 +1,4 @@
-import { View, Text, Video, Textarea, Button } from '@tarojs/components'
+import { View, Text, Video, Textarea } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState } from 'react'
 import { Network } from '@/network'
@@ -200,16 +200,21 @@ const PublishPage = () => {
                   </View>
                 </View>
 
-                <View className="flex-shrink-0">
-                  <Button
-                    className="bg-white border-2 border-orange-300 text-orange-500 text-xs"
-                    onClick={() => {
-                      setVideoPath('')
-                      setVideoDuration(0)
-                    }}
+                {/* 重新选择按钮 - 增加宽度和图标 */}
+                <View
+                  className="flex-shrink-0"
+                  onClick={() => {
+                    setVideoPath('')
+                    setVideoDuration(0)
+                  }}
+                >
+                  <View
+                    className="bg-white border-2 border-orange-300 rounded-2xl px-5 py-3 shadow-md active:scale-95 transition-transform"
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '140px' }}
                   >
-                    重新选择
-                  </Button>
+                    <Text className="text-lg mr-2">🔄</Text>
+                    <Text className="text-orange-500 font-bold text-sm">重新选择</Text>
+                  </View>
                 </View>
               </View>
             )}
