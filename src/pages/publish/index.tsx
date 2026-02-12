@@ -69,19 +69,14 @@ const PublishPage = () => {
       return
     }
 
-    if (!content.trim()) {
-      Taro.showToast({
-        title: '请输入心里话',
-        icon: 'none'
-      })
-      return
-    }
+    // 心里话可以不填，如果未填写则使用默认文案
+    const finalContent = content.trim() || '分享我的心里话'
 
     setUploading(true)
     setUploadProgress(0)
 
     try {
-      console.log('开始上传视频:', { videoPath, content })
+      console.log('开始上传视频:', { videoPath, finalContent })
       console.log('当前环境:', Taro.getEnv())
 
       // 模拟上传进度 - 改进版本
@@ -112,7 +107,7 @@ const PublishPage = () => {
         filePath: videoPath,
         name: 'video',
         formData: {
-          title: content,
+          title: finalContent,
           description: ''
         }
       })
