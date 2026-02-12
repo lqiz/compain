@@ -1,4 +1,4 @@
-import { View, Text, Video } from '@tarojs/components'
+import { View, Text } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
 import { Network } from '@/network'
@@ -26,14 +26,16 @@ const IndexPage = () => {
   const [loading, setLoading] = useState<boolean>(true)
   const [countdown, setCountdown] = useState<number>(0)
   const [currentRound, setCurrentRound] = useState<number>(1)
-  const [rulesVisible, setRulesVisible] = useState<boolean>(false)
 
   // 页面加载时获取用户信息和数据
   useEffect(() => {
     const nickname = getUserNickname()
     const age = getUserAge()
 
+    console.log('用户信息:', { nickname, age })
+
     if (!nickname || !age) {
+      console.log('跳转到登录页')
       Taro.redirectTo({
         url: '/pages/login/index'
       })
@@ -46,34 +48,26 @@ const IndexPage = () => {
 
   // 倒计时逻辑
   useEffect(() => {
-    // 计算到下一个整点的倒计时
-    // 每天23场：0点到22点
     const calculateCountdown = () => {
       const now = new Date()
       const currentHour = now.getHours()
 
-      // 如果当前时间是23点，则下一场是第二天0点
       const nextHour = new Date(now)
 
       if (currentHour >= 23) {
-        // 当前是23点，下一场是第二天0点
         nextHour.setDate(now.getDate() + 1)
         nextHour.setHours(0, 0, 0, 0)
-        setCurrentRound(1) // 下一场是第1场
+        setCurrentRound(1)
       } else {
-        // 当前是0-22点，下一场是下一小时
         nextHour.setHours(now.getHours() + 1, 0, 0, 0)
-        setCurrentRound(currentHour + 1) // 下一场的场次
+        setCurrentRound(currentHour + 1)
       }
 
       const diff = nextHour.getTime() - now.getTime()
       setCountdown(Math.floor(diff / 1000))
     }
 
-    // 初始化
     calculateCountdown()
-
-    // 每秒更新一次
     const timer = setInterval(calculateCountdown, 1000)
 
     return () => clearInterval(timer)
@@ -96,7 +90,8 @@ const IndexPage = () => {
     try {
       setLoading(true)
 
-      // 调用排名接口
+      console.log('开始加载数据')
+
       const rankingsRes = await Network.request({
         url: '/api/video/rankings',
         method: 'GET'
@@ -108,15 +103,14 @@ const IndexPage = () => {
         setRankings(rankingsRes.data.data)
       }
 
-      // 使用模拟数据（因为没有获取视频列表的接口）
-      // 注意：videoUrl 应该从后端API获取，这里使用空字符串避免Video组件报错
+      // 使用模拟数据
       setVideoList([
         {
           id: '1',
           nickname: '小明同学',
           age: 10,
           content: '今天作业太多了，写了好久都没写完，感觉好累😢',
-          videoUrl: '', // 实际应从API获取真实视频URL
+          videoUrl: '',
           likeCount: 128,
           isLiked: false
         },
@@ -125,7 +119,7 @@ const IndexPage = () => {
           nickname: '小红妹妹',
           age: 9,
           content: '妈妈今天给我买了新的画画本，好开心！🎨',
-          videoUrl: '', // 实际应从API获取真实视频URL
+          videoUrl: '',
           likeCount: 256,
           isLiked: false
         },
@@ -134,11 +128,13 @@ const IndexPage = () => {
           nickname: '小刚哥哥',
           age: 11,
           content: '今天在操场上踢足球，我们队赢了！⚽️',
-          videoUrl: '', // 实际应从API获取真实视频URL
+          videoUrl: '',
           likeCount: 89,
           isLiked: false
         }
       ])
+
+      console.log('数据加载完成')
     } catch (error) {
       console.error('加载数据失败:', error)
       Taro.showToast({
@@ -153,7 +149,6 @@ const IndexPage = () => {
   // 处理点赞
   const handleLike = async (videoId: string) => {
     try {
-      // 调用后端点赞接口
       const likeRes = await Network.request({
         url: '/api/video/like',
         method: 'POST',
@@ -163,7 +158,6 @@ const IndexPage = () => {
       console.log('点赞接口响应:', likeRes)
 
       if (likeRes.data.code === 200) {
-        // 更新前端状态
         setVideoList(prevList =>
           prevList.map(video => {
             if (video.id === videoId) {
@@ -177,7 +171,6 @@ const IndexPage = () => {
           })
         )
 
-        // 刷新排名数据
         loadData()
       } else {
         throw new Error(likeRes.data.msg || '点赞失败')
@@ -232,30 +225,19 @@ const IndexPage = () => {
 
                 {/* 视频预览 */}
                 <View className="flex-1 bg-gray-100 rounded-3xl overflow-hidden mb-3 shadow-md min-h-0">
-                  {videoList[0].videoUrl && videoList[0].videoUrl.startsWith('http') && !videoList[0].videoUrl.includes('placeholder') ? (
-                    <Video
-                      src={videoList[0].videoUrl}
-                      className="w-full h-full"
-                      controls
-                      objectFit="cover"
-                    />
-                  ) : (
-                    <View className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-sky-50 to-pink-50">
-                      <Text className="block text-4xl mb-2">🎬</Text>
-                      <Text className="block text-gray-500 text-xs">视频加载中...</Text>
-                    </View>
-                  )}
+                  <View className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-sky-50 to-pink-50">
+                    <Text className="block text-4xl mb-2">🎬</Text>
+                    <Text className="block text-gray-500 text-xs">视频加载中...</Text>
+                  </View>
                 </View>
 
                 {/* 点赞按钮 */}
                 <View
-                  className={`flex items-center justify-center rounded-full py-2 px-4 shadow-md flex-shrink-0 ${
-                    videoList[0].isLiked ? 'bg-gradient-to-r from-pink-300 to-red-300 border-2 border-pink-300' : 'bg-gradient-to-r from-sky-100 to-blue-100 border-2 border-sky-200'
-                  }`}
+                  className="flex items-center justify-center rounded-full py-2 px-4 shadow-md flex-shrink-0 bg-gradient-to-r from-sky-100 to-blue-100 border-2 border-sky-200"
                   onClick={() => handleLike(videoList[0].id)}
                 >
-                  <Text className="text-xl mr-2">{videoList[0].isLiked ? '❤️' : '🤍'}</Text>
-                  <Text className={`text-sm font-bold ${videoList[0].isLiked ? 'text-red-500' : 'text-sky-500'}`}>
+                  <Text className="text-xl mr-2">🤍</Text>
+                  <Text className="text-sm font-bold text-sky-500">
                     {videoList[0].likeCount} 个喜欢
                   </Text>
                 </View>
@@ -304,7 +286,7 @@ const IndexPage = () => {
         </>
       )}
 
-      {/* 浮动发布按钮 - 右下角固定，包含倒计时 */}
+      {/* 浮动发布按钮 - 右下角固定 */}
       <View
         style={{
           position: 'fixed',
@@ -316,7 +298,6 @@ const IndexPage = () => {
           gap: '8px'
         }}
       >
-        {/* 开始诉苦按钮 */}
         <View
           className="bg-gradient-to-r from-orange-400 via-orange-500 to-pink-500 rounded-full px-5 py-3 shadow-xl border-2 border-orange-300"
           style={{
@@ -361,112 +342,17 @@ const IndexPage = () => {
               backdropFilter: 'blur(5px)'
             }}
           >
-            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
-              <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <Text className="block text-white font-bold text-xl">
-                  {formatTime(countdown)}
-                </Text>
-                <Text className="block text-white/80 text-xs mt-0.5">
-                  第 {currentRound} 场
-                </Text>
-              </View>
-
-              {/* 规则说明图标 */}
-              <Text
-                className="text-lg cursor-pointer"
-                style={{
-                  opacity: 0.9,
-                  marginTop: '-4px'
-                }}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setRulesVisible(true)
-                }}
-              >
-                ⚠️
+            <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Text className="block text-white font-bold text-xl">
+                {formatTime(countdown)}
+              </Text>
+              <Text className="block text-white/80 text-xs mt-0.5">
+                第 {currentRound} 场
               </Text>
             </View>
           </View>
         </View>
       </View>
-
-      {/* 规则说明弹窗 */}
-      {rulesVisible && (
-        <View
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '20px'
-          }}
-          onClick={() => setRulesVisible(false)}
-        >
-          <View
-            style={{
-              backgroundColor: '#fff',
-              borderRadius: '24px',
-              padding: '24px',
-              maxWidth: '320px',
-              width: '100%',
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* 弹窗标题 */}
-            <View style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-              <Text className="text-2xl mr-2">⚠️</Text>
-              <Text className="block text-gray-800 font-bold text-xl">诉苦大会规则</Text>
-            </View>
-
-            {/* 规则内容 */}
-            <View style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
-              <View style={{ display: 'flex', alignItems: 'flex-start' }}>
-                <Text className="block text-sky-500 font-bold text-sm mr-2" style={{ marginTop: '2px' }}>•</Text>
-                <Text className="block text-gray-700 text-sm flex-1">每场诉苦大会持续1小时</Text>
-              </View>
-              <View style={{ display: 'flex', alignItems: 'flex-start' }}>
-                <Text className="block text-sky-500 font-bold text-sm mr-2" style={{ marginTop: '2px' }}>•</Text>
-                <Text className="block text-gray-700 text-sm flex-1">发布视频可获得5积分奖励</Text>
-              </View>
-              <View style={{ display: 'flex', alignItems: 'flex-start' }}>
-                <Text className="block text-sky-500 font-bold text-sm mr-2" style={{ marginTop: '2px' }}>•</Text>
-                <Text className="block text-gray-700 text-sm flex-1">每日签到可获得额外积分</Text>
-              </View>
-              <View style={{ display: 'flex', alignItems: 'flex-start' }}>
-                <Text className="block text-sky-500 font-bold text-sm mr-2" style={{ marginTop: '2px' }}>•</Text>
-                <Text className="block text-gray-700 text-sm flex-1">积分可以提升你的等级</Text>
-              </View>
-              <View style={{ display: 'flex', alignItems: 'flex-start' }}>
-                <Text className="block text-sky-500 font-bold text-sm mr-2" style={{ marginTop: '2px' }}>•</Text>
-                <Text className="block text-gray-700 text-sm flex-1">禁止发布不当内容</Text>
-              </View>
-              <View style={{ display: 'flex', alignItems: 'flex-start' }}>
-                <Text className="block text-pink-500 font-bold text-sm mr-2" style={{ marginTop: '2px' }}>⚠️</Text>
-                <Text className="block text-pink-600 text-sm flex-1">仅限15岁以下小朋友参与</Text>
-              </View>
-            </View>
-
-            {/* 关闭按钮 */}
-            <View
-              style={{
-                backgroundColor: 'linear-gradient(135deg, #FFB74D 0%, #FF8A65 50%, #FF8A80 100%)',
-                borderRadius: '16px',
-                padding: '12px'
-              }}
-              onClick={() => setRulesVisible(false)}
-            >
-              <Text className="block text-white font-bold text-center text-base">我知道了</Text>
-            </View>
-          </View>
-        </View>
-      )}
     </View>
   )
 }

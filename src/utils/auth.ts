@@ -75,6 +75,17 @@ export const getUserLevel = (): UserLevelInfo => {
 }
 
 /**
+ * 保存用户信息
+ * @param nickname 用户昵称
+ * @param age 用户年龄
+ */
+export const saveUserInfo = (nickname: string, age: number): void => {
+  Taro.setStorageSync(STORAGE_KEY_LOGGED_IN, true)
+  Taro.setStorageSync(STORAGE_KEY_NICKNAME, nickname)
+  Taro.setStorageSync(STORAGE_KEY_AGE, age)
+}
+
+/**
  * 增加用户积分
  * @param pointsToAdd 增加的积分
  * @returns 更新后的等级信息

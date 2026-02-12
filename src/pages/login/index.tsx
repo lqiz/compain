@@ -1,7 +1,7 @@
 import { View, Text, Input } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
-import { saveUserInfo, getUserNickname, getUserAge } from '@/utils/auth'
+import { saveUserInfo } from '@/utils/auth'
 
 interface LoginFormData {
   nickname: string
