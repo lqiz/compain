@@ -1,4 +1,4 @@
-import { View, Text, Video, Slider, Button } from '@tarojs/components'
+import { View, Text, Video, Button } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState, useRef } from 'react'
 
@@ -9,17 +9,20 @@ const VideoEditPage = () => {
   const [currentTime, setCurrentTime] = useState<number>(0)
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
 
-  // 编辑器状态
+  // 编辑器状态 - 使用滑动窗口方式
   const [startTime, setStartTime] = useState<number>(0)
   const [endTime, setEndTime] = useState<number>(0)
   const [selectedDuration, setSelectedDuration] = useState<number>(0)
+
+  // 手柄拖拽状态
+  const [isDraggingLeft, setIsDraggingLeft] = useState<boolean>(false)
+  const [isDraggingRight, setIsDraggingRight] = useState<boolean>(false)
 
   const videoRef = useRef<any>(null)
   const MAX_DURATION = 30 // 最大选择时长30秒
 
   Taro.useLoad(() => {
     // 从参数获取视频路径和时长
-    // 使用 Taro.getCurrentInstance 获取路由参数（兼容 H5 和小程序）
     const instance = Taro.getCurrentInstance()
     const params = instance?.router?.params
 
@@ -49,7 +52,6 @@ const VideoEditPage = () => {
   // 视频播放结束
   const handleEnded = () => {
     setIsPlaying(false)
-    // 回到选择区域的开始位置
     videoRef.current?.seek(startTime)
   }
 
@@ -58,7 +60,7 @@ const VideoEditPage = () => {
     const time = e.detail.currentTime
     setCurrentTime(time)
 
-    // 如果播放到选择区域的结束时间，自动暂停
+    // 如果播放到选择区域的结束时间，自动循环
     if (time >= endTime) {
       videoRef.current?.seek(startTime)
       videoRef.current?.play()
@@ -72,42 +74,61 @@ const VideoEditPage = () => {
     setIsPlaying(true)
   }
 
-  // 开始时间滑块变化
-  const handleStartTimeChange = (value: number) => {
-    let newStart = value
-
-    // 确保开始时间小于结束时间
-    if (newStart >= endTime) {
-      newStart = endTime - 1
-    }
-
-    // 确保选择时长不超过30秒
-    const newDuration = endTime - newStart
-    if (newDuration > MAX_DURATION) {
-      newStart = endTime - MAX_DURATION
-    }
-
-    setStartTime(newStart)
-    setSelectedDuration(endTime - newStart)
+  // 左手柄开始拖拽
+  const handleLeftHandleStart = () => {
+    setIsDraggingLeft(true)
   }
 
-  // 结束时间滑块变化
-  const handleEndTimeChange = (value: number) => {
-    let newEnd = value
+  // 右手柄开始拖拽
+  const handleRightHandleStart = () => {
+    setIsDraggingRight(true)
+  }
 
-    // 确保结束时间大于开始时间
-    if (newEnd <= startTime) {
-      newEnd = startTime + 1
+  // 处理手柄拖拽移动
+  const handleHandleMove = (e: any) => {
+    if (!isDraggingLeft && !isDraggingRight) return
+
+    const touch = e.touches[0]
+    const systemInfo = Taro.getSystemInfoSync()
+    const screenWidth = systemInfo.windowWidth
+
+    // 计算触摸位置对应的视频时间
+    const touchX = touch.clientX
+    const time = (touchX / screenWidth) * videoDuration
+
+    if (isDraggingLeft) {
+      // 更新开始时间
+      let newStart = Math.max(0, time)
+      // 确保不超过结束时间
+      if (newStart >= endTime - 1) {
+        newStart = endTime - 1
+      }
+      // 确保选择时长不超过30秒
+      if (endTime - newStart > MAX_DURATION) {
+        newStart = endTime - MAX_DURATION
+      }
+      setStartTime(newStart)
+      setSelectedDuration(endTime - newStart)
+    } else if (isDraggingRight) {
+      // 更新结束时间
+      let newEnd = Math.min(videoDuration, time)
+      // 确保不小于开始时间
+      if (newEnd <= startTime + 1) {
+        newEnd = startTime + 1
+      }
+      // 确保选择时长不超过30秒
+      if (newEnd - startTime > MAX_DURATION) {
+        newEnd = startTime + MAX_DURATION
+      }
+      setEndTime(newEnd)
+      setSelectedDuration(newEnd - startTime)
     }
+  }
 
-    // 确保选择时长不超过30秒
-    const newDuration = newEnd - startTime
-    if (newDuration > MAX_DURATION) {
-      newEnd = startTime + MAX_DURATION
-    }
-
-    setEndTime(newEnd)
-    setSelectedDuration(newEnd - startTime)
+  // 结束手柄拖拽
+  const handleHandleEnd = () => {
+    setIsDraggingLeft(false)
+    setIsDraggingRight(false)
   }
 
   // 格式化时间显示
@@ -117,16 +138,17 @@ const VideoEditPage = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
+  // 计算手柄位置（百分比）
+  const leftHandlePosition = (startTime / videoDuration) * 100
+  const rightHandlePosition = (endTime / videoDuration) * 100
+
   // 确认选择
   const handleConfirm = () => {
-    // 使用 Taro.eventCenter 传递数据
     Taro.eventCenter.trigger('videoSegment', {
       startTime,
       endTime,
       duration: selectedDuration
     })
-
-    // 返回上一页
     Taro.navigateBack()
   }
 
@@ -136,7 +158,7 @@ const VideoEditPage = () => {
   }
 
   return (
-    <View className="h-screen bg-gray-900 flex flex-col">
+    <View className="h-screen bg-gray-900 flex flex-col" style={{ minHeight: '100vh' }}>
       {/* 视频播放器区域 */}
       <View className="flex-shrink-0 bg-black relative" style={{ height: '45vh' }}>
         <Video
@@ -155,8 +177,8 @@ const VideoEditPage = () => {
         {/* 播放控制覆盖层 */}
         <View className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
           <View className="flex items-center justify-between text-white">
-            <Text className="text-sm">{formatTime(currentTime)}</Text>
-            <Text className="text-sm">{formatTime(videoDuration)}</Text>
+            <Text className="block text-sm">{formatTime(currentTime)}</Text>
+            <Text className="block text-sm">{formatTime(videoDuration)}</Text>
           </View>
         </View>
 
@@ -173,61 +195,83 @@ const VideoEditPage = () => {
         )}
       </View>
 
-      {/* 时间轴和滑块区域 */}
+      {/* 时间轴和滑动窗口区域 */}
       <View className="flex-1 bg-gray-800 flex flex-col justify-center px-4 py-6">
         {/* 选择时长提示 */}
         <View className="mb-6 flex items-center justify-between">
-          <Text className="text-white text-lg font-semibold">选择视频片段</Text>
+          <Text className="block text-white text-lg font-semibold">选择视频片段</Text>
           <View className="flex items-center">
-            <Text className="text-orange-400 text-2xl font-bold">
+            <Text className="block text-orange-400 text-2xl font-bold">
               {formatTime(selectedDuration)}
             </Text>
-            <Text className="text-gray-400 text-sm ml-2">/ 最多30秒</Text>
+            <Text className="block text-gray-400 text-sm ml-2">/ 最多30秒</Text>
           </View>
         </View>
 
-        {/* 开始时间滑块 */}
+        {/* 滑动窗口时间轴 */}
         <View className="mb-8">
-          <View className="flex items-center justify-between mb-2">
-            <Text className="text-gray-300 text-sm">开始时间</Text>
-            <Text className="text-orange-400 text-sm font-semibold">
-              {formatTime(startTime)}
-            </Text>
-          </View>
-          <Slider
-            value={startTime}
-            min={0}
-            max={videoDuration}
-            step={0.1}
-            activeColor="#f97316"
-            backgroundColor="#374151"
-            blockColor="#f97316"
-            blockSize={20}
-            showValue={false}
-            onChange={(e) => handleStartTimeChange(e.detail.value)}
-          />
-        </View>
+          {/* 时间轴背景 */}
+          <View
+            className="relative h-16 bg-gray-700 rounded-lg overflow-hidden"
+            style={{ width: '100%' }}
+            onTouchMove={handleHandleMove}
+            onTouchEnd={handleHandleEnd}
+          >
+            {/* 整个视频的时间轴 */}
+            <View className="absolute inset-0 flex items-center">
+              {/* 时间刻度 */}
+              {videoDuration > 0 && Array.from({ length: 10 }, (_, i) => (
+                <View
+                  key={i}
+                  className="flex-1 h-full border-r border-gray-600/50"
+                  style={{ width: `${100 / 10}%` }}
+                >
+                  <Text className="block text-gray-400 text-xs mt-1 text-center">
+                    {formatTime((i / 10) * videoDuration)}
+                  </Text>
+                </View>
+              ))}
+            </View>
 
-        {/* 结束时间滑块 */}
-        <View className="mb-8">
-          <View className="flex items-center justify-between mb-2">
-            <Text className="text-gray-300 text-sm">结束时间</Text>
-            <Text className="text-orange-400 text-sm font-semibold">
-              {formatTime(endTime)}
+            {/* 选择的区域高亮 */}
+            <View
+              className="absolute top-0 bottom-0 bg-orange-500/30 border-2 border-orange-500 rounded"
+              style={{
+                left: `${leftHandlePosition}%`,
+                width: `${rightHandlePosition - leftHandlePosition}%`
+              }}
+            />
+
+            {/* 左手柄 */}
+            <View
+              className="absolute top-0 bottom-0 w-6 flex items-center justify-center cursor-pointer"
+              style={{ left: `${leftHandlePosition}%`, transform: 'translateX(-50%)' }}
+              onTouchStart={handleLeftHandleStart}
+              catchMove
+            >
+              <View className="w-2 h-12 bg-orange-500 rounded-full shadow-lg" />
+            </View>
+
+            {/* 右手柄 */}
+            <View
+              className="absolute top-0 bottom-0 w-6 flex items-center justify-center cursor-pointer"
+              style={{ left: `${rightHandlePosition}%`, transform: 'translateX(-50%)' }}
+              onTouchStart={handleRightHandleStart}
+              catchMove
+            >
+              <View className="w-2 h-12 bg-orange-500 rounded-full shadow-lg" />
+            </View>
+          </View>
+
+          {/* 时间提示 */}
+          <View className="flex items-center justify-between mt-2">
+            <Text className="block text-gray-300 text-sm">
+              开始: {formatTime(startTime)}
+            </Text>
+            <Text className="block text-gray-300 text-sm">
+              结束: {formatTime(endTime)}
             </Text>
           </View>
-          <Slider
-            value={endTime}
-            min={0}
-            max={videoDuration}
-            step={0.1}
-            activeColor="#f97316"
-            backgroundColor="#374151"
-            blockColor="#f97316"
-            blockSize={20}
-            showValue={false}
-            onChange={(e) => handleEndTimeChange(e.detail.value)}
-          />
         </View>
 
         {/* 预览按钮 */}
