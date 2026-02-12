@@ -52,7 +52,14 @@ const VideoEditPage = () => {
   // 视频播放结束
   const handleEnded = () => {
     setIsPlaying(false)
-    videoRef.current?.seek(startTime)
+    // 安全检查：确保 videoRef 存在且有 seek 方法
+    if (videoRef.current && typeof videoRef.current.seek === 'function') {
+      try {
+        videoRef.current.seek(startTime)
+      } catch (error) {
+        console.error('seek 方法调用失败:', error)
+      }
+    }
   }
 
   // 监听播放时间更新
@@ -62,17 +69,65 @@ const VideoEditPage = () => {
 
     // 如果播放到选择区域的结束时间，自动循环
     if (time >= endTime) {
-      videoRef.current?.seek(startTime)
-      videoRef.current?.play()
+      // 安全检查：确保 videoRef 存在且方法可用
+      if (videoRef.current && typeof videoRef.current.seek === 'function') {
+        try {
+          videoRef.current.seek(startTime)
+        } catch (error) {
+          console.error('seek 方法调用失败:', error)
+        }
+      }
+      if (videoRef.current && typeof videoRef.current.play === 'function') {
+        try {
+          videoRef.current.play()
+        } catch (error) {
+          console.error('play 方法调用失败:', error)
+        }
+      }
     }
   }
 
   // 播放预览：播放选择的片段
   const playPreview = () => {
-    videoRef.current?.seek(startTime)
-    videoRef.current?.play()
-    setIsPlaying(true)
+    // 安全检查：确保 videoRef 存在且方法可用
+    if (videoRef.current && typeof videoRef.current.seek === 'function') {
+      try {
+        videoRef.current.seek(startTime)
+      } catch (error) {
+        console.error('seek 方法调用失败:', error)
+      }
+    }
+    if (videoRef.current && typeof videoRef.current.play === 'function') {
+      try {
+        videoRef.current.play()
+        setIsPlaying(true)
+      } catch (error) {
+        console.error('play 方法调用失败:', error)
+      }
+    }
   }
+
+  // 停止视频播放
+  const stopVideo = () => {
+    if (videoRef.current && typeof videoRef.current.stop === 'function') {
+      try {
+        videoRef.current.stop()
+      } catch (error) {
+        console.error('stop 方法调用失败:', error)
+      }
+    }
+    setIsPlaying(false)
+  }
+
+  // 页面卸载时清理
+  Taro.useUnload(() => {
+    console.log('video-edit 页面卸载')
+    // 停止视频播放
+    stopVideo()
+    // 清理手柄拖拽状态
+    setIsDraggingLeft(false)
+    setIsDraggingRight(false)
+  })
 
   // 左手柄开始拖拽
   const handleLeftHandleStart = () => {
