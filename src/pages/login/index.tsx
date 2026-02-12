@@ -1,9 +1,10 @@
-import { View, Text } from '@tarojs/components'
+import { View, Text, Input } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState } from 'react'
 
 const LoginPage = () => {
   const [age, setAge] = useState<number>(8)
+  const [nickname, setNickname] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
 
   // 增加年龄
@@ -32,6 +33,9 @@ const LoginPage = () => {
       return
     }
 
+    // 使用输入的昵称或生成默认昵称
+    const finalNickname = nickname.trim() || `小朋友${age}岁`
+
     setLoading(true)
 
     // 模拟登录请求
@@ -39,7 +43,7 @@ const LoginPage = () => {
       // 保存登录状态到本地存储
       Taro.setStorageSync('isLoggedIn', true)
       Taro.setStorageSync('userAge', age)
-      Taro.setStorageSync('userNickname', `小朋友${age}岁`)
+      Taro.setStorageSync('userNickname', finalNickname)
       Taro.setStorageSync('userPoints', 0) // 初始化积分为 0
 
       setLoading(false)
@@ -117,6 +121,26 @@ const LoginPage = () => {
 
         <Text className="block text-gray-500 text-xs text-center mt-6">
           年龄必须是 1-15 岁之间哦
+        </Text>
+      </View>
+
+      {/* 昵称输入 */}
+      <View className="mb-6">
+        <Text className="block text-gray-800 font-semibold text-base mb-3">
+          你的昵称（可选）
+        </Text>
+        <View className="bg-white border-2 border-orange-200 rounded-2xl px-4 py-3">
+          <Input
+            className="w-full bg-transparent text-gray-800 placeholder-gray-400 text-base"
+            placeholder="不填会自动生成昵称哦"
+            placeholderClass="text-gray-400"
+            value={nickname}
+            onInput={(e) => setNickname(e.detail.value)}
+            maxlength={20}
+          />
+        </View>
+        <Text className="block text-gray-500 text-xs mt-2">
+          {nickname.trim() ? `昵称：${nickname}` : `默认昵称：小朋友${age}岁`}
         </Text>
       </View>
 

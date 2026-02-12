@@ -134,7 +134,7 @@ export const addPoints = (currentPoints: number, pointsToAdd: number): UserLevel
  * 积分规则
  */
 export const POINTS_RULES = {
-  PUBLISH_VIDEO: 10, // 发布视频 +10 积分
+  PUBLISH_VIDEO: 5, // 发布视频 +5 积分
   VIDEO_COMPOSED: 20, // 视频被合成 +20 积分
   DAILY_CHECKIN: 5, // 每日签到 +5 积分
   SHARE_VIDEO: 3, // 分享视频 +3 积分

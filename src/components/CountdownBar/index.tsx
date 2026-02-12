@@ -12,14 +12,27 @@ const CountdownBar: React.FC<CountdownBarProps> = ({ className = '' }) => {
 
   useEffect(() => {
     // 计算到下一个整点的倒计时
+    // 每天23场：0点到22点
     const calculateCountdown = () => {
       const now = new Date()
+      const currentHour = now.getHours()
+
+      // 如果当前时间是23点，则下一场是第二天0点
       const nextHour = new Date(now)
-      nextHour.setHours(now.getHours() + 1, 0, 0, 0)
+
+      if (currentHour >= 23) {
+        // 当前是23点，下一场是第二天0点
+        nextHour.setDate(now.getDate() + 1)
+        nextHour.setHours(0, 0, 0, 0)
+        setCurrentRound(1) // 下一场是第1场
+      } else {
+        // 当前是0-22点，下一场是下一小时
+        nextHour.setHours(now.getHours() + 1, 0, 0, 0)
+        setCurrentRound(currentHour + 1) // 下一场的场次
+      }
 
       const diff = nextHour.getTime() - now.getTime()
       setCountdown(Math.floor(diff / 1000))
-      setCurrentRound(now.getHours() + 1)
     }
 
     // 初始化
@@ -59,7 +72,7 @@ const CountdownBar: React.FC<CountdownBarProps> = ({ className = '' }) => {
         </View>
         <View className="bg-orange-100 rounded-full px-3 py-1">
           <Text className="block text-orange-600 text-xs">
-            第 {currentRound} 场
+            第 {currentRound} 场 / 23
           </Text>
         </View>
       </View>

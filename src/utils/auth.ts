@@ -15,6 +15,8 @@ export interface UserInfo {
 const STORAGE_KEY_LOGGED_IN = 'isLoggedIn'
 const STORAGE_KEY_AGE = 'userAge'
 const STORAGE_KEY_NICKNAME = 'userNickname'
+const STORAGE_KEY_LAST_CHECKIN_DATE = 'lastCheckinDate'
+const STORAGE_KEY_CHECKIN_DAYS = 'checkinDays'
 
 /**
  * 获取登录状态
@@ -85,6 +87,67 @@ export const addUserPoints = (pointsToAdd: number): UserLevelInfo => {
 }
 
 /**
+ * 检查今日是否已签到
+ */
+export const hasCheckedInToday = (): boolean => {
+  const today = new Date().toISOString().split('T')[0]
+  const lastCheckinDate = Taro.getStorageSync(STORAGE_KEY_LAST_CHECKIN_DATE) || ''
+  return lastCheckinDate === today
+}
+
+/**
+ * 获取连续签到天数
+ */
+export const getCheckinDays = (): number => {
+  return Taro.getStorageSync(STORAGE_KEY_CHECKIN_DAYS) || 0
+}
+
+/**
+ * 每日签到
+ * @returns 签签结果
+ */
+export interface CheckinResult {
+  success: boolean
+  points: number
+  totalPoints: number
+  checkinDays: number
+  message: string
+}
+
+export const dailyCheckin = (): CheckinResult => {
+  // 检查今日是否已签到
+  if (hasCheckedInToday()) {
+    return {
+      success: false,
+      points: 0,
+      totalPoints: getUserPoints(),
+      checkinDays: getCheckinDays(),
+      message: '今日已签到，明天再来吧'
+    }
+  }
+
+  // 更新签到日期
+  const today = new Date().toISOString().split('T')[0]
+  Taro.setStorageSync(STORAGE_KEY_LAST_CHECKIN_DATE, today)
+
+  // 增加连续签到天数
+  let checkinDays = getCheckinDays()
+  checkinDays += 1
+  Taro.setStorageSync(STORAGE_KEY_CHECKIN_DAYS, checkinDays)
+
+  // 增加积分
+  const newLevelInfo = addUserPoints(POINTS_RULES.DAILY_CHECKIN)
+
+  return {
+    success: true,
+    points: POINTS_RULES.DAILY_CHECKIN,
+    totalPoints: newLevelInfo.currentPoints,
+    checkinDays,
+    message: `签到成功！+${POINTS_RULES.DAILY_CHECKIN} 积分，连续签到 ${checkinDays} 天`
+  }
+}
+
+/**
  * 退出登录
  */
 export const logout = () => {
@@ -92,6 +155,8 @@ export const logout = () => {
   Taro.removeStorageSync(STORAGE_KEY_AGE)
   Taro.removeStorageSync(STORAGE_KEY_NICKNAME)
   Taro.removeStorageSync(USER_POINTS_KEY)
+  Taro.removeStorageSync(STORAGE_KEY_LAST_CHECKIN_DATE)
+  Taro.removeStorageSync(STORAGE_KEY_CHECKIN_DAYS)
 
   // 跳转到登录页
   Taro.redirectTo({
