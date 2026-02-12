@@ -1,9 +1,66 @@
 import { Injectable, BadRequestException } from '@nestjs/common'
 import { S3Storage } from 'coze-coding-dev-sdk'
 
+// 视频信息接口
+interface Video {
+  id: string
+  nickname: string
+  age: number
+  content: string
+  videoUrl: string
+  likeCount: number
+  createdAt: Date
+}
+
+// 用户信息接口
+interface User {
+  nickname: string
+  points: number
+}
+
 @Injectable()
 export class VideoService {
   private storage: S3Storage
+
+  // 内存存储：视频列表
+  private videos: Video[] = [
+    {
+      id: '1',
+      nickname: '小明同学',
+      age: 10,
+      content: '今天作业太多了，写了好久都没写完，感觉好累😢',
+      videoUrl: 'https://via.placeholder.com/360x640/f97316/ffffff?text=Video+1',
+      likeCount: 128,
+      createdAt: new Date()
+    },
+    {
+      id: '2',
+      nickname: '小红妹妹',
+      age: 9,
+      content: '妈妈今天给我买了新的画画本，好开心！🎨',
+      videoUrl: 'https://via.placeholder.com/360x640/f97316/ffffff?text=Video+2',
+      likeCount: 256,
+      createdAt: new Date()
+    },
+    {
+      id: '3',
+      nickname: '小刚哥哥',
+      age: 11,
+      content: '今天在操场上踢足球，我们队赢了！⚽️',
+      videoUrl: 'https://via.placeholder.com/360x640/f97316/ffffff?text=Video+3',
+      likeCount: 89,
+      createdAt: new Date()
+    }
+  ]
+
+  // 内存存储：用户列表
+  private users: User[] = [
+    { nickname: '小红妹妹', points: 350 },
+    { nickname: '小明同学', points: 280 },
+    { nickname: '小刚哥哥', points: 220 },
+    { nickname: '小丽姐姐', points: 180 },
+    { nickname: '小强弟弟', points: 150 }
+  ]
 
   constructor() {
     this.storage = new S3Storage({
@@ -64,5 +121,64 @@ export class VideoService {
       console.error('视频上传失败:', error)
       throw new BadRequestException(error.message || '视频上传失败')
     }
+  }
+
+  /**
+   * 点赞视频
+   * @param videoId 视频ID
+   * @returns 点赞结果（新的点赞数）
+   */
+  async likeVideo(videoId: string): Promise<{ likeCount: number; isLiked: boolean }> {
+    console.log('处理点赞, videoId:', videoId)
+
+    // 查找视频
+    const video = this.videos.find(v => v.id === videoId)
+
+    if (!video) {
+      throw new BadRequestException('视频不存在')
+    }
+
+    // 增加点赞数
+    video.likeCount += 1
+
+    console.log(`视频 ${videoId} 点赞数增加到: ${video.likeCount}`)
+
+    // 被点赞的用户获得2积分
+    const user = this.users.find(u => u.nickname === video.nickname)
+    if (user) {
+      user.points += 2
+      console.log(`用户 ${user.nickname} 获得点赞奖励，当前积分: ${user.points}`)
+    }
+
+    return {
+      likeCount: video.likeCount,
+      isLiked: true
+    }
+  }
+
+  /**
+   * 获取用户排名
+   * @returns 用户排名列表
+   */
+  async getRankings(): Promise<{ rank: number; nickname: string; points: number }[]> {
+    console.log('获取用户排名')
+
+    // 按积分从高到低排序
+    const sortedUsers = this.users
+      .map((user, index) => ({
+        rank: index + 1,
+        nickname: user.nickname,
+        points: user.points
+      }))
+      .sort((a, b) => b.points - a.points)
+
+    // 重新计算排名（积分相同时按出现顺序）
+    sortedUsers.forEach((user, index) => {
+      user.rank = index + 1
+    })
+
+    console.log('用户排名:', sortedUsers)
+
+    return sortedUsers.slice(0, 10) // 返回前10名
   }
 }
