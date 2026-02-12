@@ -79,7 +79,7 @@ const LoginPage = () => {
 
     // 跳转到首页
     setTimeout(() => {
-      Taro.redirectTo({
+      Taro.switchTab({
         url: '/pages/index/index'
       })
     }, 1000)

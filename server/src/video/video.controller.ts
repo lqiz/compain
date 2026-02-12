@@ -2,6 +2,7 @@ import { Controller, Post, Get, UseInterceptors, UploadedFile, Body, BadRequestE
 import { FileInterceptor } from '@nestjs/platform-express'
 import { memoryStorage } from 'multer'
 import { VideoService } from './video.service'
+import { LLMClient, Config } from 'coze-coding-dev-sdk'
 
 @Controller('video')
 export class VideoController {
@@ -171,6 +172,79 @@ export class VideoController {
       code: 200,
       msg: 'success',
       data: rankings
+    }
+  }
+
+  /**
+   * 分析图片接口
+   * POST /api/video/analyze-image
+   *
+   * 请求方式：application/json
+   * 参数：
+   * - imageUrl: 图片URL（必须）
+   * - prompt: 分析提示词（可选，默认："描述这张图片的内容"）
+   *
+   * 返回：
+   * {
+   *   code: 200,
+   *   msg: 'success',
+   *   data: {
+   *     description: "图片描述内容..."
+   *   }
+   * }
+   */
+  @Post('analyze-image')
+  async analyzeImage(@Body() body: { imageUrl: string; prompt?: string }) {
+    console.log('收到图片分析请求')
+    console.log('图片URL:', body?.imageUrl)
+
+    // 验证参数
+    if (!body?.imageUrl) {
+      throw new BadRequestException('图片URL不能为空')
+    }
+
+    try {
+      // 初始化 LLM 客户端
+      const config = new Config()
+      const client = new LLMClient(config)
+
+      // 构建消息
+      const prompt = body?.prompt || '请详细描述这张图片的内容，包括主要元素、颜色、布局等信息。'
+
+      const messages = [
+        {
+          role: 'user' as const,
+          content: [
+            { type: 'text' as const, text: prompt },
+            {
+              type: 'image_url' as const,
+              image_url: {
+                url: body.imageUrl,
+                detail: 'high' as const
+              }
+            }
+          ]
+        }
+      ]
+
+      // 调用 LLM 分析图片
+      const response = await client.invoke(messages, {
+        model: 'doubao-seed-1-6-vision-250815',
+        temperature: 0.7
+      })
+
+      console.log('图片分析结果:', response.content)
+
+      return {
+        code: 200,
+        msg: 'success',
+        data: {
+          description: response.content
+        }
+      }
+    } catch (error: any) {
+      console.error('图片分析失败:', error)
+      throw new BadRequestException(error.message || '图片分析失败')
     }
   }
 }
