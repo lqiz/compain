@@ -1,377 +1,407 @@
-# 诉苦大会设计指南
+# 诉苦大会小程序 - 儿童友好设计指南
 
 ## 品牌定位
 
-- **应用名称**：诉苦大会
-- **应用定位**：孩子吐槽家长小程序
-- **设计风格**：温馨、轻松、可爱、包容
-- **目标用户**：15岁以下的小朋友
-- **品牌标语**：孩子的心里话，我们来发布
+**应用定位**：一个专为 10 岁左右小朋友设计的社交分享平台，让他们可以自由表达心里话
+
+**设计风格**：童趣、温暖、探索、成长、友谊
+
+**目标用户**：10 岁左右的小朋友（小学中年级）
+
+**品牌灵魂**：像儿童绘本一样温暖，像游乐场一样有趣
+
+---
+
+## 气质与意象
+
+**关键词**：
+- 🌈 彩虹糖罐 - 每颗都是惊喜
+- ☀️ 阳光游乐场 - 充满快乐
+- 🏠 魔法树屋 - 温暖的分享空间
+- 🎨 儿童绘本 - 简单有趣的故事
+- 🧸 毛绒玩具 - 温柔的陪伴
+
+**具象场景**：
+- 充满阳光的游乐场，五颜六色的滑梯和秋千
+- 孩子们围坐在一起分享故事的小木屋
+- 墙上贴满画作的树屋
+- 彩虹糖罐子，每一颗都是不同颜色
+- 云朵飘过蓝天的瞬间
+
+---
 
 ## 配色方案
 
-### 主色板
-- **背景色**：`bg-orange-50` / `bg-amber-50`（温暖橙色系）
-- **卡片背景**：`bg-white`
-- **主色调（品牌色）**：`text-orange-500` / `bg-orange-500`（温暖橙色）
-- **辅助色**：`text-pink-400` / `bg-pink-400`（可爱粉色）
-- **强调色**：`text-yellow-400` / `bg-yellow-400`（活力黄色）
+### 主色调（马卡龙彩虹色系）
+
+**天空蓝（主色）**：`#4FC3F7` Tailwind: `text-sky-400` / `bg-sky-400`
+- 意象：晴朗的天空、清澈的湖水
+- 用途：主要按钮、重要操作、导航选中态
+
+**柠檬黄（辅助）**：`#FFF59D` Tailwind: `text-yellow-200` / `bg-yellow-200`
+- 意象：阳光、柠檬、向日葵
+- 用途：背景装饰、高亮提示
+
+**珊瑚粉（辅助）**：`#FF8A80` Tailwind: `text-red-300` / `bg-red-300`
+- 意象：草莓、樱花、温暖的心
+- 用途：点赞、爱心、重要提示
+
+**薄荷绿（辅助）**：`#81C784` Tailwind: `text-green-300` / `bg-green-300`
+- 意象：草地、新鲜蔬菜、健康
+- 用途：成功状态、安全提示
+
+**葡萄紫（辅助）**：`#BA68C8` Tailwind: `text-purple-400` / `bg-purple-400`
+- 意象：葡萄、魔法、神秘
+- 用途：特殊功能、积分奖励
+
+**甜橙色（强调）**：`#FFB74D` Tailwind: `text-orange-300` / `bg-orange-300`
+- 意象：橙子、日落、温暖
+- 用途：发布按钮、重要操作
 
 ### 中性色
-- **主文字**：`text-gray-800`
-- **次要文字**：`text-gray-600`
-- **提示文字**：`text-gray-500`
-- **禁用文字**：`text-gray-400`
-- **边框**：`border-orange-200`
-- **分割线**：`border-gray-200`
 
-### 等级色
-- **青铜**：`bg-amber-700` / `text-amber-700`
-- **白银**：`bg-gray-300` / `text-gray-600`
-- **黄金**：`bg-yellow-400` / `text-yellow-500`
-- **铂金**：`bg-cyan-400` / `text-cyan-500`
+**云朵白**：`#FAFAFA` Tailwind: `bg-gray-50`
+- 意象：洁白的云朵、棉花糖
+- 用途：页面背景、卡片背景
 
-### 语义色
-- **成功**：`text-green-500` / `bg-green-500`
-- **警告**：`text-yellow-500` / `bg-yellow-500`
-- **错误**：`text-red-400` / `bg-red-400`
-- **信息**：`text-blue-500` / `bg-blue-500`
+**天空浅粉**：`#FCE4EC` Tailwind: `bg-pink-50`
+- 意象：粉色的天空、温柔的梦境
+- 用途：特殊页面背景
+
+**深灰**：`#424242` Tailwind: `text-gray-700`
+- 意象：温暖的炭笔、温暖的夜晚
+- 用途：主要文字
+
+**活力橙**：`#FF7043` Tailwind: `text-orange-500`
+- 意象：充满活力的橙色、热情
+- 用途：强调文字、链接
+
+### 禁用色
+
+**淡灰**：`#BDBDBD` Tailwind: `text-gray-400` / `bg-gray-300`
+- 用途：禁用状态、占位符
+
+---
 
 ## 字体规范
 
-### 字号层级
-- **H1（应用标题）**：`text-3xl` / `font-bold` (30px)
-- **H2（页面标题）**：`text-2xl` / `font-bold` (24px)
-- **H3（卡片标题）**：`text-xl` / `font-semibold` (20px)
-- **Body（正文）**：`text-base` / `font-normal` (16px)
-- **Small（辅助文字）**：`text-sm` / `font-normal` (14px)
-- **Caption（标签）**：`text-xs` / `font-medium` (12px)
+### 字体选择
 
-### 字体颜色
-- **标题**：`text-gray-800`
-- **正文**：`text-gray-700`
-- **辅助文字**：`text-gray-500`
-- **禁用文字**：`text-gray-400`
-- **链接/强调**：`text-orange-500`
+- **中文字体**：使用系统默认字体，优先使用圆润的字体风格
+- **字体大小**：
+  - 大标题：`text-2xl` (24px)
+  - 标题：`text-xl` (20px)
+  - 副标题：`text-lg` (18px)
+  - 正文：`text-base` (16px)
+  - 辅助文字：`text-sm` (14px)
+  - 小字：`text-xs` (12px)
+
+### 排版节奏
+
+- **行高**：正文使用 `leading-relaxed` (1.625)
+- **字重**：
+  - 标题：`font-bold`
+  - 正文：`font-normal`
+  - 强调：`font-semibold`
+- **字间距**：标题使用 `tracking-wide`，正文使用默认
+
+---
 
 ## 间距系统
 
 ### 页面边距
-- **页面水平边距**：`px-5` (20px)
-- **页面垂直边距**：`py-5` (20px)
-- **安全区域**：`safe-area-inset`（适配刘海屏）
-- **底部导航预留**：`pb-20` (80px) - 避开 TabBar
-
-### 组件间距
-- **组件间距（小）**：`gap-3` (12px)
-- **组件间距（中）**：`gap-4` (16px)
-- **组件间距（大）**：`gap-5` (20px)
+- 标准边距：`p-5` (20px)
+- 大边距：`p-6` (24px)
+- 小边距：`p-4` (16px)
 
 ### 卡片间距
-- **卡片内边距**：`p-5` (20px)
-- **卡片外边距**：`mb-4` (16px)
-- **卡片圆角**：`rounded-2xl` (16px)
-- **卡片阴影**：`shadow-sm`
+- 卡片内边距：`p-5` (20px)
+- 卡片外边距：`mb-4` (16px)
+
+### 组件间距
+- 大间距：`gap-4` (16px)
+- 中间距：`gap-3` (12px)
+- 小间距：`gap-2` (8px)
+
+---
 
 ## 组件规范
 
-### 倒计时组件（左上角）
+### 按钮
+
+#### 主按钮（天空蓝）
 ```tsx
-<View className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm z-50 px-5 py-3">
-  <View className="flex items-center justify-between">
-    <View className="flex items-center">
-      <Text className="block text-2xl mr-2">⏰</Text>
-      <View>
-        <Text className="block text-gray-800 font-semibold text-sm">
-          本场结束倒计时
-        </Text>
-        <Text className="block text-orange-500 font-bold text-xl">
-          {formatTime(countdown)}
-        </Text>
-      </View>
-    </View>
-    <View className="bg-orange-100 rounded-full px-3 py-1">
-      <Text className="block text-orange-600 text-xs">
-        第 {currentRound} 场
-      </Text>
-    </View>
-  </View>
+<View className="bg-sky-400 rounded-3xl px-8 py-4 shadow-lg">
+  <Text className="block text-white font-bold text-base">按钮文字</Text>
 </View>
 ```
 
-### 等级徽章
+- 圆角：`rounded-3xl` (24px)
+- 阴影：`shadow-lg`
+- 内边距：`px-8 py-4`
+- 文字：白色、加粗、16px
+
+#### 次按钮（白色描边）
 ```tsx
-{/* 青铜等级 */}
-<View className="bg-amber-700 rounded-full px-3 py-1">
-  <Text className="block text-white text-xs font-semibold">🥉 青铜</Text>
-</View>
-
-{/* 白银等级 */}
-<View className="bg-gray-300 rounded-full px-3 py-1">
-  <Text className="block text-gray-700 text-xs font-semibold">🥈 白银</Text>
-</View>
-
-{/* 黄金等级 */}
-<View className="bg-yellow-400 rounded-full px-3 py-1">
-  <Text className="block text-yellow-900 text-xs font-semibold">🥇 黄金</Text>
-</View>
-
-{/* 铂金等级 */}
-<View className="bg-cyan-400 rounded-full px-3 py-1">
-  <Text className="block text-cyan-900 text-xs font-semibold">💎 铂金</Text>
+<View className="bg-white border-3 border-sky-400 rounded-3xl px-6 py-3 shadow-md">
+  <Text className="block text-sky-400 font-semibold text-sm">按钮文字</Text>
 </View>
 ```
 
-### 积分进度条
+- 圆角：`rounded-3xl` (24px)
+- 边框：`border-3` (3px)
+- 阴影：`shadow-md`
+- 文字：天空蓝、加粗、14px
+
+#### 浮动按钮（甜橙色）
 ```tsx
-<View className="bg-white border-2 border-orange-200 rounded-2xl p-4 mb-4">
-  <View className="flex justify-between items-center mb-2">
-    <Text className="block text-gray-800 font-semibold text-base">我的等级</Text>
-    <View className="flex items-center">
-      <Text className="block text-gray-600 text-sm mr-2">{points} 积分</Text>
-      <LevelBadge level={level} />
-    </View>
-  </View>
-  <View className="w-full h-3 bg-orange-100 rounded-full overflow-hidden">
-    <View
-      className="h-full bg-orange-500 transition-all"
-      style={{ width: `${progressPercent}%` }}
-    />
-  </View>
-  <Text className="block text-gray-500 text-xs mt-2">
-    再获得 {nextLevelPoints - points} 积分升级到 {nextLevelName}
-  </Text>
+<View className="bg-gradient-to-r from-orange-300 to-orange-400 rounded-full px-6 py-4 shadow-xl">
+  <Text className="block text-white font-bold text-base">📹 开始诉苦</Text>
 </View>
 ```
 
-### 按钮规范
+- 渐变：`from-orange-300 to-orange-400`
+- 圆角：`rounded-full`
+- 阴影：`shadow-xl`
+
+### 卡片
+
+#### 标准卡片
 ```tsx
-{/* 主按钮 - 温暖橙色 */}
-<View className="bg-orange-500 rounded-2xl px-6 py-3 shadow-sm">
-  <Text className="block text-white font-semibold text-center text-base">开始诉苦</Text>
-</View>
-
-{/* 次按钮 - 浅色边框 */}
-<View className="bg-white border-2 border-orange-300 rounded-2xl px-6 py-3">
-  <Text className="block text-orange-500 font-semibold text-center text-base">返回首页</Text>
-</View>
-
-{/* 禁用态 */}
-<View className="bg-gray-200 rounded-2xl px-6 py-3 opacity-50">
-  <Text className="block text-gray-400 text-center text-base">请先登录</Text>
+<View className="bg-white rounded-3xl p-5 shadow-md border-2 border-sky-100">
+  {/* 卡片内容 */}
 </View>
 ```
 
-### 卡片规范
+- 圆角：`rounded-3xl` (24px)
+- 阴影：`shadow-md`
+- 边框：`border-2 border-sky-100`
+
+#### 突出卡片（彩色边框）
 ```tsx
-{/* 诉苦卡片 */}
-<View className="bg-white rounded-2xl p-5 shadow-sm mb-4">
-  {/* 用户信息 */}
-  <View className="flex items-center mb-3">
-    <View className="w-10 h-10 bg-orange-200 rounded-full mr-3" />
-    <View className="flex-1">
-      <Text className="block text-gray-800 font-semibold text-base">小明</Text>
-      <Text className="block text-gray-500 text-xs">10岁 · 今天</Text>
-    </View>
-  </View>
-
-  {/* 内容 */}
-  <Text className="block text-gray-700 text-base mb-3">
-    妈妈总是逼我吃胡萝卜，我真的很讨厌！
-  </Text>
-</View>
-
-{/* 合成视频卡片 */}
-<View className="bg-white rounded-2xl p-5 shadow-sm mb-4 border-2 border-purple-200">
-  <View className="flex items-center justify-between mb-3">
-    <View className="flex items-center">
-      <Text className="block text-2xl mr-2">🎬</Text>
-      <Text className="block text-purple-600 font-semibold text-sm">合成视频</Text>
-    </View>
-    <View className="bg-purple-100 rounded-full px-2 py-1">
-      <Text className="block text-purple-700 text-xs">
-        包含 {videoCount} 个小朋友的诉苦
-      </Text>
-    </View>
-  </View>
-
-  <View className="aspect-[9/16] bg-gray-100 rounded-xl overflow-hidden mb-3">
-    <Video src={videoUrl} className="w-full h-full" controls />
-  </View>
-
-  <View className="flex items-center justify-between">
-    <Text className="block text-gray-500 text-xs">
-      已分享到抖音
-    </Text>
-    <Text className="block text-gray-500 text-xs">
-      {publishTime}
-    </Text>
-  </View>
+<View className="bg-gradient-to-br from-pink-50 to-sky-50 rounded-3xl p-5 shadow-lg border-3 border-pink-200">
+  {/* 卡片内容 */}
 </View>
 ```
 
-### 输入框规范
-```tsx
-{/* 温暖风格输入框 */}
-<View className="bg-white border-2 border-orange-200 rounded-2xl px-4 py-3 mb-4">
-  <Input
-    className="w-full bg-transparent text-gray-800 placeholder-gray-400 text-base"
-    placeholder="输入你的昵称"
-    placeholderClass="text-gray-400"
-  />
-</View>
+- 背景：渐变色
+- 边框：`border-3` (3px)
+- 阴影：`shadow-lg`
 
-{/* 文本域 */}
-<View className="bg-white border-2 border-orange-200 rounded-2xl px-4 py-3 mb-4">
-  <Textarea
-    className="w-full bg-transparent text-gray-800 placeholder-gray-400 text-base min-h-[150px]"
-    placeholder="分享你的心里话..."
-    placeholderClass="text-gray-400"
-    value={content}
-    onInput={(e) => setContent(e.detail.value)}
-    maxlength={500}
-    autoHeight
-  />
-  <View className="flex justify-end">
-    <Text className="block text-gray-400 text-xs">{content.length}/500</Text>
-  </View>
+### 输入框
+```tsx
+<View className="bg-white border-3 border-sky-200 rounded-3xl px-6 py-4 shadow-sm">
+  <Input className="w-full bg-transparent text-base" placeholder="请输入..." />
 </View>
 ```
 
-### 空状态规范
+- 圆角：`rounded-3xl` (24px)
+- 边框：`border-3` (3px)
+- 内边距：`px-6 py-4`
+
+### 标签
 ```tsx
-<View className="flex flex-col items-center justify-center py-12">
-  <Text className="block text-6xl mb-4">📢</Text>
-  <Text className="block text-gray-600 text-base mb-2">还没有诉苦内容</Text>
-  <Text className="block text-gray-500 text-sm">来分享你的心里话吧</Text>
+<View className="bg-sky-100 rounded-full px-4 py-2">
+  <Text className="block text-sky-500 text-xs font-semibold">标签文字</Text>
 </View>
 ```
 
-### 提示框规范
+- 圆角：`rounded-full`
+- 背景：浅色背景
+- 文字：深色文字
+
+### 进度条
 ```tsx
-{/* 温馨提示 */}
-<View className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-4">
-  <Text className="block text-yellow-700 font-semibold text-sm mb-1">💡 温馨提示</Text>
-  <Text className="block text-yellow-600 text-xs">
-    这里只允许 15 岁以下的小朋友使用哦
-  </Text>
+<View className="w-full h-4 bg-gray-100 rounded-full overflow-hidden">
+  <View className="h-full bg-gradient-to-r from-sky-400 to-green-300 transition-all" style={{ width: '50%' }} />
 </View>
 ```
+
+- 高度：`h-4` (16px)
+- 圆角：`rounded-full`
+- 渐变：`from-sky-400 to-green-300`
+
+---
 
 ## 导航结构
 
 ### TabBar 配置
 ```typescript
-// src/app.config.ts
-export default defineAppConfig({
-  pages: [
-    'pages/login/index',
-    'pages/index/index',
-    'pages/mine/index',
-    'pages/activity/index'
-  ],
-  tabBar: {
-    color: '#666666',
-    selectedColor: '#f97316', // 橙色
-    backgroundColor: '#ffffff',
-    borderStyle: 'white',
-    list: [
-      { pagePath: 'pages/index/index', text: '全部' },
-      { pagePath: 'pages/mine/index', text: '我的' },
-      { pagePath: 'pages/activity/index', text: '活动' }
-    ]
-  }
-})
+tabBar: {
+  color: '#9E9E9E',
+  selectedColor: '#4FC3F7',
+  backgroundColor: '#FFFFFF',
+  borderStyle: 'white',
+  list: [
+    { pagePath: 'pages/index/index', text: '全部' },
+    { pagePath: 'pages/mine/index', text: '我的' },
+    { pagePath: 'pages/activity/index', text: '活动' }
+  ]
+}
 ```
 
-### 页面跳转规范
-- 登录页 → 首页：`Taro.redirectTo({ url: '/pages/index/index' })`
-- TabBar 页面切换：`Taro.switchTab({ url: '/pages/index/index' })`
-- 未登录跳转：`Taro.redirectTo` 替换当前页面
+- 未选中：灰色
+- 选中：天空蓝
+- 背景：白色
 
-## 等级系统
+---
 
-### 等级规则
-- **青铜**：初始等级，0 积分
-- **白银**：150 积分
-- **黄金**：250 积分
-- **铂金**：400 积分
+## 空状态
 
-### 积分规则
-- 发布视频：+10 积分
-- 视频被合成：+20 积分
-- 每日签到：+5 积分
+```tsx
+<View className="bg-white rounded-3xl p-10 text-center shadow-md">
+  <Text className="block text-6xl mb-4">📹</Text>
+  <Text className="block text-gray-500 text-lg mb-2">还没有内容</Text>
+  <Text className="block text-gray-400 text-sm">去发布你的第一个心里话吧</Text>
+</View>
+```
+
+- 图标：超大尺寸（text-6xl）
+- 文字：标题 + 说明
+- 样式：卡片式布局
+
+---
+
+## 加载状态
+
+```tsx
+<View className="flex items-center justify-center py-10">
+  <Text className="block text-sky-400 text-lg">🌈 加载中...</Text>
+</View>
+```
+
+- 图标：彩虹 emoji
+- 文字：浅色说明
+
+---
+
+## 设计禁忌
+
+❌ **禁止使用的设计**：
+- 不要使用尖锐的直角，所有元素必须圆润
+- 不要使用深色背景，保持明亮温暖
+- 不要使用复杂的渐变，使用简单的双色渐变
+- 不要使用冷色调，避免蓝色、灰色为主
+- 不要使用小字体，最小 12px
+- 不要使用密集的布局，保持足够留白
+
+❌ **禁止的颜色组合**：
+- 禁止：黑 + 红（太严肃）
+- 禁止：深蓝 + 深灰（太冷）
+- 禁止：纯黑 + 纯白（太生硬）
+
+---
 
 ## 特殊组件
 
-### 登录成功提示
-```tsx
-<View className="flex flex-col items-center justify-center py-12">
-  <Text className="block text-6xl mb-4">🎉</Text>
-  <Text className="block text-gray-800 font-bold text-2xl mb-2">欢迎来到诉苦大会！</Text>
-  <Text className="block text-gray-600 text-base mb-6">
-    孩子的心里话，我们来发布
-  </Text>
+### 等级徽章
 
-  <View className="bg-green-50 border border-green-200 rounded-2xl px-5 py-4">
-    <Text className="block text-green-700 text-sm text-center">
-      你已成功登录，快去发布你的心里话吧！
-    </Text>
+```tsx
+<View className={`rounded-full px-4 py-2 ${levelColorClass}`}>
+  <Text className="block text-xs font-bold">{levelEmoji} {levelName}</Text>
+</View>
+```
+
+- 圆角：`rounded-full`
+- 颜色：根据等级变化
+
+### 卡通形象卡片
+```tsx
+<View className="bg-gradient-to-br from-sky-100 to-pink-100 rounded-3xl p-8 text-center shadow-lg">
+  <Text className="block text-7xl mb-3">{characterEmoji}</Text>
+  <Text className="block text-gray-800 font-bold text-2xl mb-1">{characterName}</Text>
+  <Text className="block text-gray-500 text-sm">{characterDescription}</Text>
+</View>
+```
+
+- 背景：渐变色
+- 图标：超大尺寸（text-7xl）
+- 文字：标题 + 描述
+
+### 倒计时条
+```tsx
+<View className="bg-white/95 backdrop-blur-sm shadow-lg border-b-3 border-sky-200">
+  {/* 倒计时内容 */}
+</View>
+```
+
+- 背景：半透明白色
+- 边框：底部 3px 边框
+- 阴影：`shadow-lg`
+
+---
+
+## 页面结构模板
+
+### 标准页面
+```tsx
+<View className="min-h-screen bg-gray-50 flex flex-col">
+  {/* 倒计时条 */}
+  <CountdownBar />
+
+  {/* 主要内容 */}
+  <View className="p-5 flex-1 pb-24">
+    {/* 页面内容 */}
   </View>
 </View>
 ```
 
-### 年龄限制提示
+### 有浮动按钮的页面
 ```tsx
-<View className="flex flex-col items-center justify-center py-12">
-  <Text className="block text-6xl mb-4">😢</Text>
-  <Text className="block text-gray-800 font-bold text-2xl mb-2">抱歉</Text>
-  <Text className="block text-gray-600 text-base mb-6 text-center">
-    诉苦大会只允许 15 岁以下的小朋友使用哦
-  </Text>
+<View className="min-h-screen bg-gray-50 flex flex-col">
+  {/* 倒计时条 */}
+  <CountdownBar />
 
-  <View className="bg-red-50 border border-red-200 rounded-2xl px-5 py-4">
-    <Text className="block text-red-700 text-sm text-center">
-      如果你是 15 岁以下的小朋友，请返回重新选择年龄
-    </Text>
+  {/* 主要内容 */}
+  <View className="p-5 flex-1 pb-32">
+    {/* 页面内容 */}
+  </View>
+
+  {/* 浮动按钮 */}
+  <View style={{ position: 'fixed', right: 20, bottom: 80, zIndex: 100 }}>
+    {/* 浮动按钮内容 */}
   </View>
 </View>
 ```
 
-## 图标与表情
+---
 
-### 常用表情
-- 📢（诉苦）
-- 🎉（庆祝）
-- 😢（遗憾）
-- 💡（提示）
-- ✨（亮点）
-- 💬（评论）
-- ❤️（点赞）
-- ⏰（倒计时）
-- 🎬（合成视频）
-- 🥉🥈🥇💎（等级徽章）
+## 设计原则
 
-### 图标使用
-- 使用 Text 组件展示表情符号
-- 统一使用 `text-4xl` 大小
-- 保持表情风格一致
+1. **儿童优先**：所有设计都要考虑 10 岁儿童的认知能力和操作习惯
+2. **温暖友好**：使用温暖的颜色和圆润的形状，营造友好氛围
+3. **简单明了**：避免复杂的操作和过多的信息
+4. **有趣好玩**：加入游戏化元素和可爱的图标
+5. **安全可靠**：使用安全的设计语言，让孩子和家长放心
 
-## 小程序约束
+---
 
-### 包体积限制
-- 主包限制：2MB
-- 单个分包限制：2MB
-- 整体分包限制：20MB
+## 图标使用指南
 
-### 性能优化
-- 图片使用懒加载
-- 视频使用懒加载
-- 减少 setData 调用频率
-- 使用骨架屏优化加载体验
+### 常用图标
 
-### 安全与隐私
-- 不收集用户真实姓名
-- 不收集用户联系方式
-- 不存储用户地理位置
-- 对用户昵称进行脱敏处理
+- ✅ 成功：`✨` `🎉` `🌟` `⭐`
+- ❌ 失败：`😔` `😢` `😿`
+- 💡 提示：`💡` `🌈` `🎨`
+- 📹 视频：`📹` `🎬` `🎥`
+- ❤️ 点赞：`❤️` `🤍` `💕`
+- 🔒 锁定：`🔒` `🔐`
+- 🏆 排名：`🏆` `🥇` `🥈` `🥉`
+
+### 图标大小
+
+- 大图标：`text-6xl` (60px)
+- 中图标：`text-4xl` (40px)
+- 小图标：`text-2xl` (24px)
+- 迷你图标：`text-xl` (20px)
+
+---
+
+## 最后检查
+
+✅ 把产品名遮住，仅凭描述能认出是什么产品吗？
+✅ 是否出现了"科技蓝+圆角卡片+蓝紫色渐变"这类万能但无趣的组合？
+✅ 所有组件是否都使用了大圆角？
+✅ 颜色是否鲜艳活泼？
+✅ 字体是否足够大？
+✅ 布局是否简单明了？

@@ -57,22 +57,24 @@ const CountdownBar: React.FC<CountdownBarProps> = ({ className = '' }) => {
   }
 
   return (
-    <View className={`fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm z-50 px-5 py-3 ${className}`}>
+    <View className={`fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm shadow-lg border-b-3 border-sky-200 px-5 py-3 z-50 ${className}`}>
       <View className="flex items-center justify-between">
         <View className="flex items-center">
-          <Text className="block text-2xl mr-2">⏰</Text>
+          <Text className="block text-3xl mr-3">⏰</Text>
           <View>
-            <Text className="block text-gray-800 font-semibold text-sm">
+            <Text className="block text-gray-700 font-bold text-base mb-1">
               本场结束倒计时
             </Text>
-            <Text className="block text-orange-500 font-bold text-xl">
-              {formatTime(countdown)}
-            </Text>
+            <View className="bg-gradient-to-r from-sky-400 to-blue-400 rounded-full px-4 py-2 shadow-md">
+              <Text className="block text-white font-bold text-2xl">
+                {formatTime(countdown)}
+              </Text>
+            </View>
           </View>
         </View>
-        <View className="bg-orange-100 rounded-full px-3 py-1">
-          <Text className="block text-orange-600 text-xs">
-            第 {currentRound} 场 / 23
+        <View className="bg-gradient-to-br from-pink-100 to-purple-100 rounded-full px-5 py-3 shadow-md border-2 border-pink-200">
+          <Text className="block text-purple-500 font-bold text-sm">
+            第 {currentRound} 场 / 23 🎉
           </Text>
         </View>
       </View>

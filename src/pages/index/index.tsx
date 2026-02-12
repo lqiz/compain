@@ -66,7 +66,7 @@ const IndexPage = () => {
           nickname: '小明同学',
           age: 10,
           content: '今天作业太多了，写了好久都没写完，感觉好累😢',
-          videoUrl: 'https://via.placeholder.com/360x640/f97316/ffffff?text=Video+1',
+          videoUrl: 'https://via.placeholder.com/360x640/4FC3F7/ffffff?text=Video+1',
           likeCount: 128,
           isLiked: false
         },
@@ -75,7 +75,7 @@ const IndexPage = () => {
           nickname: '小红妹妹',
           age: 9,
           content: '妈妈今天给我买了新的画画本，好开心！🎨',
-          videoUrl: 'https://via.placeholder.com/360x640/f97316/ffffff?text=Video+2',
+          videoUrl: 'https://via.placeholder.com/360x640/81C784/ffffff?text=Video+2',
           likeCount: 256,
           isLiked: false
         },
@@ -84,7 +84,7 @@ const IndexPage = () => {
           nickname: '小刚哥哥',
           age: 11,
           content: '今天在操场上踢足球，我们队赢了！⚽️',
-          videoUrl: 'https://via.placeholder.com/360x640/f97316/ffffff?text=Video+3',
+          videoUrl: 'https://via.placeholder.com/360x640/FFB74D/ffffff?text=Video+3',
           likeCount: 89,
           isLiked: false
         }
@@ -149,56 +149,61 @@ const IndexPage = () => {
   }
 
   return (
-    <View className="min-h-screen bg-orange-50 flex flex-col">
+    <View className="min-h-screen bg-gray-50 flex flex-col">
       <CountdownBar />
 
       <View className="flex-1 pb-32">
         {/* 顶部 */}
-        <View className="px-5 py-4 bg-white sticky top-0 z-10 shadow-sm">
+        <View className="px-5 py-5 bg-white sticky top-0 z-10 shadow-md border-b-3 border-sky-200">
           <View className="flex justify-between items-center">
-            <Text className="block text-xl font-bold text-gray-800">全部视频</Text>
+            <View>
+              <Text className="block text-2xl font-bold text-gray-700">📺 全部视频</Text>
+              <Text className="block text-sky-400 text-sm">小朋友们的心里话</Text>
+            </View>
             <Button
-              className="bg-orange-500 text-white text-xs px-4 py-2 rounded-full"
+              className="bg-gradient-to-r from-sky-400 to-blue-400 text-white text-sm px-6 py-3 rounded-3xl shadow-md"
               onClick={goToPublish}
             >
-              发布
+              ✨ 发布
             </Button>
           </View>
         </View>
 
         {loading ? (
           <View className="flex items-center justify-center py-20">
-            <Text className="block text-gray-400 text-sm">加载中...</Text>
+            <Text className="block text-sky-400 text-lg">🌈 加载中...</Text>
           </View>
         ) : (
           <>
             {/* 视频列表 */}
-            <View className="p-4 space-y-4">
+            <View className="p-5 space-y-5">
               {videoList.map(video => (
                 <View
                   key={video.id}
-                  className="bg-white rounded-2xl p-4 shadow-sm"
+                  className="bg-white rounded-3xl p-5 shadow-lg border-2 border-sky-100"
                 >
                   {/* 用户信息 */}
-                  <View className="flex items-center mb-3">
-                    <View className="w-10 h-10 bg-orange-200 rounded-full mr-3 flex items-center justify-center">
-                      <Text className="block text-orange-500 font-bold text-sm">{video.age}</Text>
+                  <View className="flex items-center mb-4">
+                    <View className="w-12 h-12 bg-gradient-to-br from-sky-100 to-pink-100 rounded-full mr-4 flex items-center justify-center border-2 border-sky-200">
+                      <Text className="block text-sky-500 font-bold text-lg">{video.age}</Text>
                     </View>
                     <View className="flex-1">
-                      <Text className="block text-gray-800 font-semibold text-sm">{video.nickname}</Text>
-                      <Text className="block text-gray-500 text-xs">{video.age}岁</Text>
+                      <Text className="block text-gray-700 font-bold text-base">{video.nickname}</Text>
+                      <View className="bg-sky-100 rounded-full px-3 py-1 w-fit mt-1">
+                        <Text className="block text-sky-500 text-xs font-semibold">{video.age}岁小朋友</Text>
+                      </View>
                     </View>
                   </View>
 
                   {/* 内容 */}
-                  <View className="mb-3">
-                    <Text className="block text-gray-800 text-sm leading-relaxed">
+                  <View className="mb-4 bg-gradient-to-br from-sky-50 to-pink-50 rounded-2xl p-4">
+                    <Text className="block text-gray-700 text-base leading-relaxed">
                       {video.content}
                     </Text>
                   </View>
 
                   {/* 视频预览 */}
-                  <View className="aspect-[9/16] bg-gray-100 rounded-xl overflow-hidden mb-3">
+                  <View className="aspect-[9/16] bg-gray-100 rounded-3xl overflow-hidden mb-4 shadow-md">
                     <Video
                       src={video.videoUrl}
                       className="w-full h-full"
@@ -209,14 +214,14 @@ const IndexPage = () => {
 
                   {/* 点赞按钮 */}
                   <View
-                    className={`flex items-center justify-center rounded-full py-2 px-4 ${
-                      video.isLiked ? 'bg-red-50 border border-red-200' : 'bg-orange-50 border border-orange-200'
+                    className={`flex items-center justify-center rounded-full py-3 px-6 shadow-md ${
+                      video.isLiked ? 'bg-gradient-to-r from-pink-300 to-red-300 border-2 border-pink-300' : 'bg-gradient-to-r from-sky-100 to-blue-100 border-2 border-sky-200'
                     }`}
                     onClick={() => handleLike(video.id)}
                   >
-                    <Text className="text-lg mr-2">{video.isLiked ? '❤️' : '🤍'}</Text>
-                    <Text className={`text-sm font-medium ${video.isLiked ? 'text-red-500' : 'text-orange-500'}`}>
-                      {video.likeCount}
+                    <Text className="text-2xl mr-3">{video.isLiked ? '❤️' : '🤍'}</Text>
+                    <Text className={`text-base font-bold ${video.isLiked ? 'text-red-500' : 'text-sky-500'}`}>
+                      {video.likeCount} 个喜欢
                     </Text>
                   </View>
                 </View>
@@ -224,37 +229,37 @@ const IndexPage = () => {
             </View>
 
             {/* 用户排名 */}
-            <View className="px-4 pb-4">
-              <View className="bg-white rounded-2xl p-4 shadow-sm">
-                <Text className="block text-gray-800 font-semibold text-base mb-4">
-                  🏆 用户排行榜
+            <View className="px-5 pb-5">
+              <View className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl p-5 shadow-lg border-2 border-purple-200">
+                <Text className="block text-gray-700 font-bold text-lg mb-4">
+                  🏆 小朋友排行榜
                 </Text>
 
                 <View className="space-y-3">
                   {rankings.map(item => (
                     <View
                       key={item.rank}
-                      className="flex items-center justify-between py-2"
+                      className="flex items-center justify-between bg-white rounded-2xl p-3 shadow-sm border border-purple-100"
                     >
                       <View className="flex items-center">
                         <View
-                          className={`w-8 h-8 rounded-full mr-3 flex items-center justify-center ${
+                          className={`w-10 h-10 rounded-full mr-3 flex items-center justify-center ${
                             item.rank === 1
-                              ? 'bg-yellow-400'
+                              ? 'bg-gradient-to-br from-yellow-300 to-yellow-400 border-2 border-yellow-300'
                               : item.rank === 2
-                              ? 'bg-gray-300'
+                              ? 'bg-gradient-to-br from-gray-300 to-gray-400 border-2 border-gray-300'
                               : item.rank === 3
-                              ? 'bg-orange-400'
-                              : 'bg-gray-200'
+                              ? 'bg-gradient-to-br from-orange-300 to-orange-400 border-2 border-orange-300'
+                              : 'bg-gradient-to-br from-purple-200 to-purple-300 border-2 border-purple-200'
                           }`}
                         >
                           <Text className="block text-white font-bold text-sm">{item.rank}</Text>
                         </View>
-                        <Text className="block text-gray-800 text-sm font-medium">{item.nickname}</Text>
+                        <Text className="block text-gray-700 text-base font-bold">{item.nickname}</Text>
                       </View>
-                      <View className="flex items-center">
-                        <Text className="block text-orange-500 font-bold text-sm">{item.points}</Text>
-                        <Text className="block text-gray-400 text-xs ml-1">积分</Text>
+                      <View className="flex items-center bg-sky-100 rounded-full px-3 py-1">
+                        <Text className="block text-sky-500 font-bold text-sm">{item.points}</Text>
+                        <Text className="block text-sky-400 text-xs ml-1">分</Text>
                       </View>
                     </View>
                   ))}
@@ -275,7 +280,7 @@ const IndexPage = () => {
         }}
       >
         <View
-          className="bg-gradient-to-r from-orange-500 to-red-500 rounded-full px-6 py-3 shadow-lg"
+          className="bg-gradient-to-r from-orange-300 to-orange-400 rounded-full px-8 py-4 shadow-xl border-2 border-orange-200"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -283,8 +288,8 @@ const IndexPage = () => {
           }}
           onClick={goToPublish}
         >
-          <Text className="block text-2xl mr-2">📹</Text>
-          <Text className="block text-white font-bold text-base">开始诉苦</Text>
+          <Text className="text-3xl mr-3">📹</Text>
+          <Text className="block text-white font-bold text-lg">开始诉苦</Text>
         </View>
       </View>
     </View>
