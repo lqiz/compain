@@ -14,7 +14,7 @@ export namespace Network {
             return url
         }
         const finalUrl = `${PROJECT_DOMAIN}${url}`
-        console.log('[Network] URL:', finalUrl, '(PROJECT_DOMAIN:', PROJECT_DOMAIN + ')')
+        console.log('[Network] URL:', finalUrl)
         return finalUrl
     }
 

@@ -4,7 +4,8 @@ export default defineAppConfig({
     'pages/index/index',
     'pages/mine/index',
     'pages/activity/index',
-    'pages/publish/index'
+    'pages/publish/index',
+    'pages/video-edit/index'
   ],
   window: {
     backgroundTextStyle: 'light',

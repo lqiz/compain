@@ -11,6 +11,11 @@ const PublishPage = () => {
   const [uploading, setUploading] = useState<boolean>(false)
   const [uploadProgress, setUploadProgress] = useState<number>(0)
 
+  // 视频片段信息
+  const [startTime, setStartTime] = useState<number>(0)
+  const [endTime, setEndTime] = useState<number>(0)
+  const [hasEdited, setHasEdited] = useState<boolean>(false)
+
   // 页面加载时验证登录状态
   Taro.useLoad(() => {
     const nickname = getUserNickname()
@@ -27,6 +32,31 @@ const PublishPage = () => {
         })
       }, 1500)
     }
+
+    // 监听编辑器返回的片段信息
+    Taro.eventCenter.on('videoSegment', (data) => {
+      console.log('收到视频片段信息:', data)
+      // 从全局存储获取视频路径
+      const savedVideoPath = Taro.getStorageSync('editingVideoPath')
+      const savedDuration = Taro.getStorageSync('editingVideoDuration')
+
+      if (savedVideoPath) {
+        setVideoPath(savedVideoPath)
+        setVideoDuration(savedDuration)
+        setStartTime(data.startTime)
+        setEndTime(data.endTime)
+        setHasEdited(true)
+
+        // 清除临时存储
+        Taro.removeStorageSync('editingVideoPath')
+        Taro.removeStorageSync('editingVideoDuration')
+      }
+    })
+  })
+
+  // 页面卸载时移除监听
+  Taro.useUnload(() => {
+    Taro.eventCenter.off('videoSegment')
   })
 
   // 返回首页
@@ -48,8 +78,14 @@ const PublishPage = () => {
 
       console.log('选择视频:', res)
 
-      setVideoPath(res.tempFilePath)
-      setVideoDuration(res.duration)
+      // 保存视频信息到全局存储
+      Taro.setStorageSync('editingVideoPath', res.tempFilePath)
+      Taro.setStorageSync('editingVideoDuration', res.duration)
+
+      // 跳转到视频编辑器
+      Taro.navigateTo({
+        url: `/pages/video-edit/index?videoPath=${encodeURIComponent(res.tempFilePath)}&duration=${res.duration}`
+      })
     } catch (error) {
       console.error('选择视频失败:', error)
       Taro.showToast({
@@ -147,7 +183,10 @@ const PublishPage = () => {
         name: 'video',
         formData: {
           title: finalContent,
-          description: ''
+          description: '',
+          startTime: startTime.toString(),
+          endTime: endTime.toString(),
+          hasEdited: hasEdited.toString()
         }
       })
 

@@ -16,6 +16,9 @@ export class VideoController {
    * - video: 视频文件（必须）
    * - title: 视频标题（可选）
    * - description: 视频描述（可选）
+   * - startTime: 剪辑开始时间（秒，可选）
+   * - endTime: 剪辑结束时间（秒，可选）
+   * - hasEdited: 是否剪辑（可选，true/false）
    *
    * 返回：
    * {
@@ -24,7 +27,10 @@ export class VideoController {
    *   data: {
    *     videoUrl: 'https://...',
    *     title: '视频标题',
-   *     description: '视频描述'
+   *     description: '视频描述',
+   *     startTime: 0,
+   *     endTime: 30,
+   *     hasEdited: true
    *   }
    * }
    */
@@ -39,7 +45,13 @@ export class VideoController {
   )
   async uploadVideo(
     @UploadedFile() file: Express.Multer.File,
-    @Body() body: { title?: string; description?: string }
+    @Body() body: {
+      title?: string
+      description?: string
+      startTime?: string
+      endTime?: string
+      hasEdited?: string
+    }
   ) {
     console.log('收到视频上传请求')
     console.log('文件信息:', {
@@ -49,6 +61,11 @@ export class VideoController {
     })
     console.log('视频标题:', body?.title)
     console.log('视频描述:', body?.description)
+    console.log('剪辑信息:', {
+      startTime: body?.startTime,
+      endTime: body?.endTime,
+      hasEdited: body?.hasEdited
+    })
 
     // 验证文件是否存在
     if (!file) {
@@ -65,21 +82,28 @@ export class VideoController {
       throw new BadRequestException('视频文件大小不能超过 100MB')
     }
 
-    // 上传视频
+    // 解析剪辑参数
+    const startTime = body?.hasEdited === 'true' ? parseFloat(body?.startTime || '0') : 0
+    const endTime = body?.hasEdited === 'true' ? parseFloat(body?.endTime || '30') : 0
+
+    // 上传视频（暂时上传完整视频，剪辑信息保存在数据库）
     const videoUrl = await this.videoService.uploadVideo(
       file.buffer,
       file.originalname,
       file.mimetype
     )
 
-    // 返回结果
+    // 返回结果（包含剪辑信息）
     return {
       code: 200,
       msg: 'success',
       data: {
         videoUrl,
         title: body?.title || '',
-        description: body?.description || ''
+        description: body?.description || '',
+        startTime,
+        endTime,
+        hasEdited: body?.hasEdited === 'true'
       }
     }
   }
