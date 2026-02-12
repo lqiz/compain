@@ -19,14 +19,14 @@ const VideoEditPage = () => {
 
   Taro.useLoad(() => {
     // 从参数获取视频路径和时长
-    const pages = Taro.getCurrentPages()
-    const currentPage = pages[pages.length - 1]
-    const params = currentPage.$router.params
+    // 使用 Taro.getCurrentInstance 获取路由参数（兼容 H5 和小程序）
+    const instance = Taro.getCurrentInstance()
+    const params = instance?.router?.params
 
-    if (params.videoPath) {
+    if (params?.videoPath) {
       setVideoPath(decodeURIComponent(params.videoPath))
     }
-    if (params.duration) {
+    if (params?.duration) {
       const duration = parseFloat(params.duration)
       setVideoDuration(duration)
       // 初始化选择范围：从0开始，最多选择30秒
