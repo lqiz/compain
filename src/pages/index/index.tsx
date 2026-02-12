@@ -154,7 +154,7 @@ const IndexPage = () => {
 
       <View className="flex-1 pb-32">
         {/* 顶部 */}
-        <View className="px-5 py-5 bg-white sticky top-0 z-10 shadow-md border-b-3 border-sky-200">
+        <View className="px-5 py-5 bg-white shadow-md border-b-3 border-sky-200">
           <View className="flex justify-between items-center">
             <View>
               <Text className="block text-2xl font-bold text-gray-700">📺 全部视频</Text>

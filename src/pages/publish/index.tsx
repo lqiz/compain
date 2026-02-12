@@ -174,13 +174,13 @@ const PublishPage = () => {
       <CountdownBar />
 
       {/* 内容区域，增加顶部间距避免被 CountdownBar 遮挡 */}
-      <View className="p-5 flex-1 pb-20 pt-16">
+      <View className="p-5 flex-1 pb-20 pt-28">
         {/* 顶部操作栏 */}
         <View className="flex items-center mb-6">
           {/* 返回按钮 - 增大可点击区域 */}
           <View
             className="bg-white border-2 border-orange-500 rounded-full px-6 py-3 shadow-md"
-            style={{ minWidth: '100px', zIndex: 100 }}
+            style={{ minWidth: '100px' }}
             onClick={handleBack}
           >
             <Text className="block text-orange-500 text-base font-bold">← 返回</Text>
