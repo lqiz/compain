@@ -152,7 +152,7 @@ const IndexPage = () => {
     <View className="min-h-screen bg-orange-50 flex flex-col">
       <CountdownBar />
 
-      <View className="flex-1 pb-24">
+      <View className="flex-1 pb-32">
         {/* 顶部 */}
         <View className="px-5 py-4 bg-white sticky top-0 z-10 shadow-sm">
           <View className="flex justify-between items-center">
@@ -263,6 +263,29 @@ const IndexPage = () => {
             </View>
           </>
         )}
+      </View>
+
+      {/* 浮动发布按钮 - 右下角固定 */}
+      <View
+        style={{
+          position: 'fixed',
+          right: '20px',
+          bottom: '80px',
+          zIndex: 100
+        }}
+      >
+        <View
+          className="bg-gradient-to-r from-orange-500 to-red-500 rounded-full px-6 py-3 shadow-lg"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            flexDirection: 'row'
+          }}
+          onClick={goToPublish}
+        >
+          <Text className="block text-2xl mr-2">📹</Text>
+          <Text className="block text-white font-bold text-base">开始诉苦</Text>
+        </View>
       </View>
     </View>
   )

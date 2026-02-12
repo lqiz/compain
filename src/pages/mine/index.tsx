@@ -2,7 +2,7 @@ import { View, Text, Video } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
 import { getUserNickname, getUserAge, getUserPoints, getUserLevel, logout } from '@/utils/auth'
-import { getLevelDisplayText, getLevelBadgeClass } from '@/utils/level'
+import { getLevelDisplayText, getLevelBadgeClass, getAllCharacters } from '@/utils/level'
 
 interface UserVideo {
   id: string
@@ -13,6 +13,14 @@ interface UserVideo {
   composedWith?: string[]
 }
 
+interface CharacterItem {
+  level: string
+  name: string
+  emoji: string
+  description: string
+  unlockPoints: number
+}
+
 const MinePage = () => {
   const [userNickname, setUserNickname] = useState<string>('')
   const [userAge, setUserAge] = useState<number>(0)
@@ -20,6 +28,7 @@ const MinePage = () => {
   const [levelInfo, setLevelInfo] = useState<any>(null)
   const [myVideos, setMyVideos] = useState<UserVideo[]>([])
   const [composedVideos, setComposedVideos] = useState<UserVideo[]>([])
+  const [characters, setCharacters] = useState<CharacterItem[]>([])
 
   // 页面加载时获取用户信息
   useEffect(() => {
@@ -40,6 +49,9 @@ const MinePage = () => {
     setUserAge(age)
     setUserPoints(points)
     setLevelInfo(level)
+
+    // 加载卡通形象
+    setCharacters(getAllCharacters())
 
     // 模拟加载用户视频数据
     loadUserVideos()
@@ -121,6 +133,19 @@ const MinePage = () => {
             </View>
           </View>
 
+          {/* 卡通形象展示 */}
+          <View className="flex items-center justify-center mb-4">
+            <View className="bg-gradient-to-br from-orange-100 to-yellow-100 rounded-2xl p-6 text-center">
+              <Text className="block text-6xl mb-2">{levelInfo.character.emoji}</Text>
+              <Text className="block text-gray-800 font-bold text-lg mb-1">
+                {levelInfo.character.name}
+              </Text>
+              <Text className="block text-gray-600 text-xs">
+                {levelInfo.character.description}
+              </Text>
+            </View>
+          </View>
+
           <View className="flex justify-between items-center mb-3">
             <View>
               <Text className="block text-gray-500 text-xs">当前积分</Text>
@@ -152,6 +177,46 @@ const MinePage = () => {
           )}
         </View>
       )}
+
+      {/* 卡通形象收藏馆 */}
+      <View className="mb-6">
+        <Text className="block text-gray-800 font-bold text-xl mb-4">卡通形象收藏馆</Text>
+
+        <View className="grid grid-cols-2 gap-3">
+          {characters.map((char) => {
+            const isUnlocked = userPoints >= char.unlockPoints
+            const isCurrent = levelInfo?.level === char.level
+
+            return (
+              <View
+                key={char.level}
+                className={`rounded-2xl p-4 text-center ${
+                  isCurrent
+                    ? 'bg-gradient-to-br from-orange-400 to-yellow-400 border-2 border-orange-500'
+                    : isUnlocked
+                    ? 'bg-white border-2 border-orange-200'
+                    : 'bg-gray-100 border-2 border-gray-200'
+                }`}
+              >
+                <Text className={`block text-4xl mb-2 ${isUnlocked ? '' : 'opacity-50'}`}>
+                  {isUnlocked ? char.emoji : '🔒'}
+                </Text>
+                <Text className={`block font-bold text-sm mb-1 ${isUnlocked ? 'text-gray-800' : 'text-gray-400'}`}>
+                  {isUnlocked ? char.name : '???'}
+                </Text>
+                <Text className={`block text-xs ${isUnlocked ? 'text-gray-500' : 'text-gray-400'}`}>
+                  {isUnlocked ? `${char.unlockPoints}积分` : `${char.unlockPoints}积分解锁`}
+                </Text>
+                {isCurrent && (
+                  <View className="mt-2 bg-white rounded-full px-2 py-1">
+                    <Text className="block text-orange-600 text-xs font-semibold">当前</Text>
+                  </View>
+                )}
+              </View>
+            )
+          })}
+        </View>
+      </View>
 
       {/* 我发布的视频 */}
       <View className="mb-6">

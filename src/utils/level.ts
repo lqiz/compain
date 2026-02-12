@@ -4,6 +4,16 @@
 export type Level = 'bronze' | 'silver' | 'gold' | 'platinum'
 
 /**
+ * 卡通形象信息
+ */
+export interface CatCharacter {
+  name: string // 卡通形象名称
+  emoji: string // 卡通形象emoji
+  description: string // 形象描述
+  unlockPoints: number // 解锁所需积分
+}
+
+/**
  * 等级信息
  */
 export interface LevelInfo {
@@ -12,6 +22,7 @@ export interface LevelInfo {
   levelEmoji: string
   minPoints: number
   colorClass: string
+  character: CatCharacter // 卡通形象
 }
 
 /**
@@ -22,6 +33,37 @@ export interface UserLevelInfo extends LevelInfo {
   nextLevelPoints: number
   progressPercent: number
   pointsToNextLevel: number
+  isCharacterUnlocked: boolean // 卡通形象是否已解锁
+}
+
+/**
+ * 卡通形象配置
+ */
+const CHARACTERS: Record<Level, CatCharacter> = {
+  bronze: {
+    name: '猫宝宝',
+    emoji: '🐱',
+    description: '可爱的小猫咪，刚刚开始探索这个世界',
+    unlockPoints: 0
+  },
+  silver: {
+    name: '儿童猫',
+    emoji: '😺',
+    description: '活泼好动的小朋友猫咪，充满好奇心',
+    unlockPoints: 150
+  },
+  gold: {
+    name: '青年猫',
+    emoji: '😸',
+    description: '阳光帅气的青年猫咪，充满活力',
+    unlockPoints: 250
+  },
+  platinum: {
+    name: '中年猫咪',
+    emoji: '😻',
+    description: '成熟稳重的中年猫咪，智慧与优雅并存',
+    unlockPoints: 400
+  }
 }
 
 /**
@@ -33,28 +75,32 @@ const LEVEL_CONFIG: Record<Level, LevelInfo> = {
     levelName: '青铜',
     levelEmoji: '🥉',
     minPoints: 0,
-    colorClass: 'bg-amber-700 text-white'
+    colorClass: 'bg-amber-700 text-white',
+    character: CHARACTERS.bronze
   },
   silver: {
     level: 'silver',
     levelName: '白银',
     levelEmoji: '🥈',
     minPoints: 150,
-    colorClass: 'bg-gray-300 text-gray-700'
+    colorClass: 'bg-gray-300 text-gray-700',
+    character: CHARACTERS.silver
   },
   gold: {
     level: 'gold',
     levelName: '黄金',
     levelEmoji: '🥇',
     minPoints: 250,
-    colorClass: 'bg-yellow-400 text-yellow-900'
+    colorClass: 'bg-yellow-400 text-yellow-900',
+    character: CHARACTERS.gold
   },
   platinum: {
     level: 'platinum',
     levelName: '铂金',
     levelEmoji: '💎',
     minPoints: 400,
-    colorClass: 'bg-cyan-400 text-cyan-900'
+    colorClass: 'bg-cyan-400 text-cyan-900',
+    character: CHARACTERS.platinum
   }
 }
 
@@ -90,12 +136,16 @@ export const getUserLevelInfo = (points: number): UserLevelInfo => {
     ? 100
     : ((points - currentLevelConfig.minPoints) / (nextLevelConfig.minPoints - currentLevelConfig.minPoints)) * 100
 
+  // 判断卡通形象是否已解锁
+  const isCharacterUnlocked = points >= currentLevelConfig.character.unlockPoints
+
   return {
     ...currentLevelConfig,
     currentPoints: points,
     nextLevelPoints: nextLevelConfig.minPoints,
     progressPercent: Math.round(progressPercent),
-    pointsToNextLevel: nextLevel === currentLevel ? 0 : nextLevelConfig.minPoints - points
+    pointsToNextLevel: nextLevel === currentLevel ? 0 : nextLevelConfig.minPoints - points,
+    isCharacterUnlocked
   }
 }
 
@@ -117,6 +167,17 @@ export const getLevelBadgeClass = (level: Level): string => {
 export const getLevelDisplayText = (level: Level): string => {
   const config = LEVEL_CONFIG[level]
   return `${config.levelEmoji} ${config.levelName}`
+}
+
+/**
+ * 获取所有卡通形象
+ * @returns 所有卡通形象列表
+ */
+export const getAllCharacters = (): Array<{ level: Level } & CatCharacter> => {
+  return Object.entries(CHARACTERS).map(([level, character]) => ({
+    level: level as Level,
+    ...character
+  }))
 }
 
 /**
