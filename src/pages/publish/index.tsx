@@ -81,19 +81,34 @@ const PublishPage = () => {
     setUploadProgress(0)
 
     try {
-      // 模拟上传进度
+      console.log('开始上传视频:', { videoPath, content })
+      console.log('当前环境:', Taro.getEnv())
+
+      // 模拟上传进度 - 改进版本
       const progressInterval = setInterval(() => {
         setUploadProgress(prev => {
-          if (prev >= 90) {
+          if (prev >= 95) {
             clearInterval(progressInterval)
-            return 90
+            return 95
           }
-          return prev + 10
+          return prev + 5
         })
       }, 200)
 
-      const uploadRes = await Network.uploadFile({
-        url: '/api/video/upload',
+      // H5 环境下使用完整 URL，小程序使用相对路径
+      const env = Taro.getEnv() as string
+      const isH5 = env.includes('h5') || env.includes('web')
+      const uploadUrl = isH5 ? 'http://localhost:3000/api/video/upload' : '/api/video/upload'
+
+      console.log('上传URL:', uploadUrl)
+
+      // 添加超时处理
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('上传超时')), 30000) // 30秒超时
+      })
+
+      const uploadPromise = Network.uploadFile({
+        url: uploadUrl,
         filePath: videoPath,
         name: 'video',
         formData: {
@@ -102,39 +117,70 @@ const PublishPage = () => {
         }
       })
 
+      // 使用 Promise.race 处理超时
+      const uploadRes = await Promise.race([uploadPromise, timeoutPromise]) as any
+
       clearInterval(progressInterval)
+      setUploadProgress(100)
 
       console.log('上传响应:', uploadRes)
+      console.log('上传响应数据:', uploadRes.data)
+      console.log('上传响应状态码:', uploadRes.statusCode)
 
-      const responseText = uploadRes.data
-      const response = JSON.parse(responseText)
+      if (uploadRes.statusCode === 200) {
+        let response
+        try {
+          response = JSON.parse(uploadRes.data)
+        } catch (e) {
+          console.error('解析响应失败:', e, uploadRes.data)
+          throw new Error('服务器返回数据格式错误')
+        }
 
-      if (response.code === 200) {
-        setVideoPath('')
-        setContent('')
-        setUploadProgress(100)
+        console.log('解析后的响应:', response)
 
-        const newLevelInfo = addUserPoints(POINTS_RULES.PUBLISH_VIDEO)
-        console.log('发布视频获得积分，新等级:', newLevelInfo)
+        if (response.code === 200) {
+          setVideoPath('')
+          setContent('')
 
-        Taro.showToast({
-          title: `发布成功！+${POINTS_RULES.PUBLISH_VIDEO} 积分`,
-          icon: 'success'
-        })
+          const newLevelInfo = addUserPoints(POINTS_RULES.PUBLISH_VIDEO)
+          console.log('发布视频获得积分，新等级:', newLevelInfo)
 
-        setTimeout(() => {
-          Taro.switchTab({
-            url: '/pages/index/index'
+          Taro.showToast({
+            title: `发布成功！+${POINTS_RULES.PUBLISH_VIDEO} 积分`,
+            icon: 'success'
           })
-        }, 2000)
+
+          setTimeout(() => {
+            Taro.switchTab({
+              url: '/pages/index/index'
+            })
+          }, 2000)
+        } else {
+          throw new Error(response.msg || '发布失败')
+        }
       } else {
-        throw new Error(response.msg || '发布失败')
+        throw new Error(`上传失败，状态码: ${uploadRes.statusCode}`)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('上传失败:', error)
+      console.error('错误详情:', {
+        message: error?.message,
+        stack: error?.stack
+      })
+
+      let errorMessage = '发布失败，请重试'
+      if (error?.message) {
+        if (error.message.includes('超时')) {
+          errorMessage = '上传超时，请检查网络后重试'
+        } else if (error.message.includes('状态码')) {
+          errorMessage = error.message
+        }
+      }
+
       Taro.showToast({
-        title: '发布失败，请重试',
-        icon: 'none'
+        title: errorMessage,
+        icon: 'none',
+        duration: 3000
       })
     } finally {
       setUploading(false)
