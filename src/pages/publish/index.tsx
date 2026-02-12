@@ -69,14 +69,28 @@ const PublishPage = () => {
   // 选择视频
   const chooseVideo = async () => {
     try {
+      // 注意：微信小程序的 maxDuration 参数最大值为 60 秒
+      // 所以我们设置为 60，然后在选择后检查实际时长
       const res = await Taro.chooseVideo({
         sourceType: ['album', 'camera'],
-        maxDuration: 600, // 增加到10分钟，允许用户选择更长的视频进行剪辑
+        maxDuration: 60, // 微信小程序限制，最大值为 60 秒
         camera: 'back',
         compressed: true
       })
 
       console.log('选择视频:', res)
+      console.log('视频时长:', res.duration, '秒')
+
+      // 检查视频时长（虽然 maxDuration=60，但为了保险起见再检查一次）
+      const MAX_ALLOWED_DURATION = 600 // 10分钟
+      if (res.duration > MAX_ALLOWED_DURATION) {
+        Taro.showToast({
+          title: `视频时长过长（${Math.round(res.duration / 60)}分钟），请选择10分钟以内的视频`,
+          icon: 'none',
+          duration: 3000
+        })
+        return
+      }
 
       // 保存视频信息到全局存储
       Taro.setStorageSync('editingVideoPath', res.tempFilePath)
@@ -93,13 +107,14 @@ const PublishPage = () => {
       let errorMessage = '选择视频失败，请重试'
 
       if (error?.errMsg) {
-        if (error.errMsg.includes('maxDuration')) {
-          errorMessage = '视频时长不能超过10分钟，请选择更短的视频'
-        } else if (error.errMsg.includes('cancel')) {
+        if (error.errMsg.includes('cancel')) {
           // 用户取消选择，不需要提示
           return
         } else if (error.errMsg.includes('no video')) {
           errorMessage = '未选择视频，请重新选择'
+        } else if (error.errMsg.includes('maxDuration')) {
+          // 虽然 maxDuration=60，但还是提示一下
+          errorMessage = '视频时长不能超过60秒，请选择更短的视频'
         }
       }
 
