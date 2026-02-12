@@ -3,7 +3,6 @@ import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
 import { Network } from '@/network'
 import { getUserNickname, getUserAge } from '@/utils/auth'
-import CountdownBar from '@/components/CountdownBar'
 
 interface VideoCard {
   id: string
@@ -25,6 +24,8 @@ const IndexPage = () => {
   const [videoList, setVideoList] = useState<VideoCard[]>([])
   const [rankings, setRankings] = useState<RankingItem[]>([])
   const [loading, setLoading] = useState<boolean>(true)
+  const [countdown, setCountdown] = useState<number>(0)
+  const [currentRound, setCurrentRound] = useState<number>(1)
 
   // 页面加载时获取用户信息和数据
   useEffect(() => {
@@ -41,6 +42,53 @@ const IndexPage = () => {
     // 加载视频列表和排名
     loadData()
   }, [])
+
+  // 倒计时逻辑
+  useEffect(() => {
+    // 计算到下一个整点的倒计时
+    // 每天23场：0点到22点
+    const calculateCountdown = () => {
+      const now = new Date()
+      const currentHour = now.getHours()
+
+      // 如果当前时间是23点，则下一场是第二天0点
+      const nextHour = new Date(now)
+
+      if (currentHour >= 23) {
+        // 当前是23点，下一场是第二天0点
+        nextHour.setDate(now.getDate() + 1)
+        nextHour.setHours(0, 0, 0, 0)
+        setCurrentRound(1) // 下一场是第1场
+      } else {
+        // 当前是0-22点，下一场是下一小时
+        nextHour.setHours(now.getHours() + 1, 0, 0, 0)
+        setCurrentRound(currentHour + 1) // 下一场的场次
+      }
+
+      const diff = nextHour.getTime() - now.getTime()
+      setCountdown(Math.floor(diff / 1000))
+    }
+
+    // 初始化
+    calculateCountdown()
+
+    // 每秒更新一次
+    const timer = setInterval(calculateCountdown, 1000)
+
+    return () => clearInterval(timer)
+  }, [])
+
+  // 格式化时间显示
+  const formatTime = (seconds: number): string => {
+    const hours = Math.floor(seconds / 3600)
+    const minutes = Math.floor((seconds % 3600) / 60)
+    const secs = seconds % 60
+
+    if (hours > 0) {
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+    }
+    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+  }
 
   // 加载数据
   const loadData = async () => {
@@ -151,9 +199,7 @@ const IndexPage = () => {
 
   return (
     <View className="min-h-screen bg-gray-50 flex flex-col">
-      <CountdownBar />
-
-      <View className="flex-1 pb-32">
+      <View className="flex-1 pb-36">
         {/* 顶部 */}
         <View className="px-5 py-5 bg-white shadow-md border-b-3 border-sky-200">
           <View className="flex justify-between items-center">
@@ -278,26 +324,86 @@ const IndexPage = () => {
         )}
       </View>
 
-      {/* 浮动发布按钮 - 右下角固定 */}
+      {/* 浮动发布按钮 - 右下角固定，包含倒计时 */}
       <View
         style={{
           position: 'fixed',
-          right: '20px',
-          bottom: '80px',
-          zIndex: 100
+          right: '16px',
+          bottom: '60px',
+          zIndex: 100,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px'
         }}
       >
+        {/* 开始诉苦按钮 */}
         <View
-          className="bg-gradient-to-r from-orange-300 to-orange-400 rounded-full px-8 py-4 shadow-xl border-2 border-orange-200"
+          className="bg-gradient-to-r from-orange-400 via-orange-500 to-pink-500 rounded-full px-8 py-5 shadow-2xl border-3 border-orange-300"
           style={{
             display: 'flex',
             alignItems: 'center',
-            flexDirection: 'row'
+            flexDirection: 'row',
+            backdropFilter: 'blur(10px)',
+            background: 'linear-gradient(135deg, #FFB74D 0%, #FF8A65 50%, #FF8A80 100%)'
           }}
           onClick={goToPublish}
         >
-          <Text className="text-3xl mr-3">📹</Text>
-          <Text className="block text-white font-bold text-lg">开始诉苦</Text>
+          <View
+            style={{
+              width: '52px',
+              height: '52px',
+              borderRadius: '50%',
+              backgroundColor: 'rgba(255, 255, 255, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: '16px'
+            }}
+          >
+            <Text className="text-3xl">📹</Text>
+          </View>
+
+          <View
+            style={{
+              flex: 1
+            }}
+          >
+            <Text className="block text-white font-bold text-xl">开始诉苦</Text>
+            <Text className="block text-white/90 text-xs mt-1">发布你的心里话</Text>
+          </View>
+
+          {/* 倒计时显示 */}
+          <View
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.25)',
+              borderRadius: '20px',
+              padding: '8px 16px',
+              backdropFilter: 'blur(5px)'
+            }}
+          >
+            <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Text className="block text-white font-bold text-2xl">
+                {formatTime(countdown)}
+              </Text>
+              <Text className="block text-white/80 text-xs mt-1">
+                第 {currentRound} 场
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* 提示文字 */}
+        <View
+          style={{
+            backgroundColor: 'rgba(255, 183, 77, 0.9)',
+            borderRadius: '20px',
+            padding: '8px 16px',
+            boxShadow: '0 4px 12px rgba(255, 138, 101, 0.3)'
+          }}
+        >
+          <Text className="block text-white text-xs text-center font-medium">
+            ⏰ 本场结束倒计时
+          </Text>
         </View>
       </View>
     </View>

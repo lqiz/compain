@@ -3,7 +3,6 @@ import Taro from '@tarojs/taro'
 import { useState } from 'react'
 import { Network } from '@/network'
 import { getUserNickname, getUserAge, logout, addUserPoints, POINTS_RULES } from '@/utils/auth'
-import CountdownBar from '@/components/CountdownBar'
 
 const PublishPage = () => {
   const [videoPath, setVideoPath] = useState<string>('')
@@ -171,10 +170,8 @@ const PublishPage = () => {
 
   return (
     <View className="min-h-screen bg-orange-50 flex flex-col">
-      <CountdownBar />
-
-      {/* 内容区域，增加顶部间距避免被 CountdownBar 遮挡 */}
-      <View className="p-5 flex-1 pb-20 pt-28">
+      {/* 内容区域 */}
+      <View className="p-5 flex-1 pb-20">
         {/* 顶部操作栏 */}
         <View className="flex items-center mb-6">
           {/* 返回按钮 - 增大可点击区域 */}
