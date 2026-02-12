@@ -10,11 +10,8 @@ const PublishPage = () => {
   const [content, setContent] = useState<string>('')
   const [uploading, setUploading] = useState<boolean>(false)
   const [uploadProgress, setUploadProgress] = useState<number>(0)
-  const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string>('')
-  const [userNickname, setUserNickname] = useState<string>('')
-  const [userAge, setUserAge] = useState<number>(0)
 
-  // 页面加载时获取用户信息
+  // 页面加载时验证登录状态
   Taro.useLoad(() => {
     const nickname = getUserNickname()
     const age = getUserAge()
@@ -29,11 +26,7 @@ const PublishPage = () => {
           url: '/pages/login/index'
         })
       }, 1500)
-      return
     }
-
-    setUserNickname(nickname)
-    setUserAge(age)
   })
 
   // 返回首页
@@ -57,7 +50,6 @@ const PublishPage = () => {
 
       setVideoPath(res.tempFilePath)
       setVideoDuration(res.duration)
-      setUploadedVideoUrl('')
     } catch (error) {
       console.error('选择视频失败:', error)
       Taro.showToast({
@@ -118,7 +110,6 @@ const PublishPage = () => {
       const response = JSON.parse(responseText)
 
       if (response.code === 200) {
-        setUploadedVideoUrl(response.data.videoUrl)
         setVideoPath('')
         setContent('')
         setUploadProgress(100)
@@ -157,156 +148,119 @@ const PublishPage = () => {
   }
 
   return (
-    <View className="min-h-screen bg-orange-50 flex flex-col">
+    <View className="h-screen bg-orange-50 flex flex-col overflow-hidden">
       {/* 内容区域 */}
-      <View className="p-5 flex-1 pb-20">
+      <View className="flex-1 flex flex-col overflow-hidden">
         {/* 顶部操作栏 */}
-        <View className="flex items-center mb-6">
-          {/* 返回按钮 - 增大可点击区域 */}
+        <View className="flex items-center px-4 py-3 flex-shrink-0">
+          {/* 返回按钮 */}
           <View
-            className="bg-white border-2 border-orange-500 rounded-full px-6 py-3 shadow-md"
-            style={{ minWidth: '100px' }}
+            className="bg-white border-2 border-orange-500 rounded-full px-5 py-2 shadow-md"
+            style={{ minWidth: '80px' }}
             onClick={handleBack}
           >
-            <Text className="block text-orange-500 text-base font-bold">← 返回</Text>
+            <Text className="block text-orange-500 text-sm font-bold">← 返回</Text>
           </View>
 
           {/* 页面标题 */}
-          <View className="flex-1 ml-4">
-            <Text className="block text-xl font-bold text-gray-800">发布心里话</Text>
+          <View className="flex-1 ml-3">
+            <Text className="block text-lg font-bold text-gray-800">发布心里话</Text>
             <Text className="block text-gray-500 text-xs">孩子的心里话，我们来发布</Text>
           </View>
         </View>
 
-        {/* 用户信息 */}
-        <View className="flex items-center mb-6">
-          <View className="w-12 h-12 bg-orange-200 rounded-full mr-3 flex items-center justify-center">
-            <Text className="block text-orange-500 font-bold text-xl">{userAge}</Text>
-          </View>
-          <View>
-            <Text className="block text-gray-800 font-semibold text-base">{userNickname}</Text>
-            <Text className="block text-gray-500 text-xs">诉苦大会 · {userAge}岁</Text>
-          </View>
-        </View>
+        {/* 主要内容区域 */}
+        <View className="flex-1 px-4 pb-4 overflow-hidden flex flex-col">
+          {/* 视频选择/预览区域 - 占据约40%高度 */}
+          <View className="flex-1 flex flex-col min-h-0 mb-3">
+            {!videoPath ? (
+              <View
+                className="flex-1 flex items-center justify-center border-2 border-dashed border-orange-200 rounded-2xl bg-white min-h-0"
+                onClick={chooseVideo}
+              >
+                <View className="flex flex-col items-center">
+                  <Text className="block text-4xl mb-2">📹</Text>
+                  <Text className="block text-gray-800 font-semibold text-sm mb-1">选择视频</Text>
+                  <Text className="block text-gray-500 text-xs">支持 MP4 格式，最大 100MB</Text>
+                </View>
+              </View>
+            ) : (
+              <View className="flex-1 flex flex-col min-h-0">
+                <View className="flex-1 bg-white rounded-2xl overflow-hidden relative mb-2 shadow-sm min-h-0">
+                  <Video
+                    src={videoPath}
+                    className="w-full h-full"
+                    controls
+                    objectFit="cover"
+                  />
+                  <View className="absolute top-2 right-2 bg-black/70 rounded-full px-2 py-0.5">
+                    <Text className="block text-white text-xs font-medium">
+                      {formatDuration(videoDuration)}
+                    </Text>
+                  </View>
+                </View>
 
-        {/* 温馨提示 */}
-        <View className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-6">
-          <Text className="block text-yellow-700 font-semibold text-sm mb-1">💡 温馨提示</Text>
-          <Text className="block text-yellow-600 text-xs leading-relaxed">
-            请文明诉苦，不使用不当语言，让这里成为孩子们温暖的港湾
-          </Text>
-        </View>
+                <View className="flex-shrink-0">
+                  <Button
+                    className="bg-white border-2 border-orange-300 text-orange-500 text-xs"
+                    onClick={() => {
+                      setVideoPath('')
+                      setVideoDuration(0)
+                    }}
+                  >
+                    重新选择
+                  </Button>
+                </View>
+              </View>
+            )}
+          </View>
 
-        {/* 视频选择区域 */}
-        {!videoPath ? (
-          <View className="mb-6">
-            <View
-              className="flex items-center justify-center py-12 border-2 border-dashed border-orange-200 rounded-2xl bg-white"
-              onClick={chooseVideo}
-            >
-              <View className="flex flex-col items-center">
-                <Text className="block text-5xl mb-3">📹</Text>
-                <Text className="block text-gray-800 font-semibold text-base mb-1">选择视频</Text>
-                <Text className="block text-gray-500 text-sm">支持 MP4 格式，最大 100MB</Text>
+          {/* 心里话输入区域 - 占据约25%高度 */}
+          <View className="h-[25%] flex flex-col mb-3 flex-shrink-0">
+            <Text className="block text-gray-800 font-semibold text-sm mb-2 flex-shrink-0">你的心里话</Text>
+            <View className="bg-white border-2 border-orange-200 rounded-2xl px-3 py-2 flex-1 flex flex-col min-h-0">
+              <Textarea
+                className="w-full bg-transparent text-gray-800 placeholder-gray-400 text-sm flex-1 min-h-0"
+                placeholder="分享你的心里话，想说什么就说什么..."
+                placeholderClass="text-gray-400"
+                value={content}
+                onInput={(e) => setContent(e.detail.value)}
+                maxlength={500}
+                autoHeight={false}
+              />
+              <View className="flex justify-end flex-shrink-0">
+                <Text className="block text-gray-400 text-xs">{content.length}/500</Text>
               </View>
             </View>
           </View>
-        ) : (
-          <View className="mb-6">
-            <View className="aspect-[9/16] bg-white rounded-2xl overflow-hidden relative mb-4 shadow-sm">
-              <Video
-                src={videoPath}
-                className="w-full h-full"
-                controls
-                objectFit="cover"
-              />
-              <View className="absolute top-2 right-2 bg-black/70 rounded-full px-3 py-1">
-                <Text className="block text-white text-xs font-medium">
-                  {formatDuration(videoDuration)}
+
+          {/* 发布按钮 */}
+          <View className="flex-shrink-0">
+            {uploading ? (
+              <View className="bg-white border-2 border-orange-200 rounded-2xl p-3">
+                <View className="flex justify-between items-center mb-2">
+                  <Text className="block text-gray-800 text-xs">发布中...</Text>
+                  <Text className="block text-orange-500 text-xs">{uploadProgress}%</Text>
+                </View>
+                <View className="w-full h-2 bg-orange-100 rounded-full overflow-hidden">
+                  <View
+                    className="h-full bg-orange-500 transition-all"
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </View>
+              </View>
+            ) : (
+              <View
+                className="bg-orange-500 rounded-2xl px-6 py-3 shadow-sm"
+                onClick={uploadVideo}
+              >
+                <Text className="block text-white font-semibold text-center text-sm">
+                  发布心里话
                 </Text>
               </View>
-            </View>
-
-            <View className="mb-4">
-              <Button
-                className="bg-white border-2 border-orange-300 text-orange-500 text-sm"
-                onClick={() => {
-                  setVideoPath('')
-                  setVideoDuration(0)
-                }}
-              >
-                重新选择
-              </Button>
-            </View>
-          </View>
-        )}
-
-        {/* 心里话输入 */}
-        <View className="mb-6 flex-1">
-          <Text className="block text-gray-800 font-semibold text-base mb-2">你的心里话</Text>
-          <View className="bg-white border-2 border-orange-200 rounded-2xl px-4 py-3 flex-1">
-            <Textarea
-              className="w-full bg-transparent text-gray-800 placeholder-gray-400 text-base min-h-[150px]"
-              placeholder="分享你的心里话，想说什么就说什么..."
-              placeholderClass="text-gray-400"
-              value={content}
-              onInput={(e) => setContent(e.detail.value)}
-              maxlength={500}
-              autoHeight
-            />
-            <View className="flex justify-end">
-              <Text className="block text-gray-400 text-xs">{content.length}/500</Text>
-            </View>
+            )}
           </View>
         </View>
-
-        {/* 发布按钮 */}
-        <View className="mb-6">
-          {uploading ? (
-            <View className="bg-white border-2 border-orange-200 rounded-2xl p-4">
-              <View className="flex justify-between items-center mb-2">
-                <Text className="block text-gray-800 text-sm">发布中...</Text>
-                <Text className="block text-orange-500 text-sm">{uploadProgress}%</Text>
-              </View>
-              <View className="w-full h-2 bg-orange-100 rounded-full overflow-hidden">
-                <View
-                  className="h-full bg-orange-500 transition-all"
-                  style={{ width: `${uploadProgress}%` }}
-                />
-              </View>
-            </View>
-          ) : (
-            <View
-              className="bg-orange-500 rounded-2xl px-6 py-4 shadow-sm"
-              onClick={uploadVideo}
-            >
-              <Text className="block text-white font-semibold text-center text-base">
-                发布心里话
-              </Text>
-            </View>
-          )}
-        </View>
-
-        {/* 已发布视频预览 */}
-        {uploadedVideoUrl && (
-          <View className="bg-white rounded-2xl p-5 mb-4 shadow-sm">
-            <View className="flex items-center mb-3">
-              <Text className="block text-2xl mr-2">🎉</Text>
-              <Text className="block text-gray-800 font-semibold text-base">发布成功</Text>
-            </View>
-            <View className="aspect-[9/16] bg-gray-100 rounded-xl overflow-hidden mb-3">
-              <Video
-                src={uploadedVideoUrl}
-                className="w-full h-full"
-                controls
-                objectFit="cover"
-              />
-            </View>
-            <Text className="block text-gray-500 text-sm text-center">
-              你的心里话已成功发布
-            </Text>
-          </View>
-        )}
       </View>
     </View>
   )
