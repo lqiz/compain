@@ -166,7 +166,7 @@ const LoginPage = () => {
 
         {/* 登录按钮 */}
         <View
-          className="w-full bg-gradient-to-r from-sky-400 via-purple-400 to-pink-400 rounded-2xl py-4 shadow-xl border-2 border-white"
+          className="w-full bg-gradient-to-r from-orange-400 to-yellow-400 rounded-2xl py-4 shadow-xl border-2 border-orange-300"
           onClick={handleLogin}
         >
           <Text className="block text-white font-bold text-lg text-center">

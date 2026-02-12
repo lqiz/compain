@@ -1,7 +1,7 @@
 import { View, Text, Video } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
-import { getUserNickname, getUserAge, getUserPoints, getUserLevel, logout } from '@/utils/auth'
+import { getUserNickname, getUserAge, getUserPoints, getUserLevel, logout, dailyCheckin, hasCheckedInToday, getCheckinDays } from '@/utils/auth'
 import { getLevelDisplayText, getLevelBadgeClass, getAllCharacters } from '@/utils/level'
 
 interface UserVideo {
@@ -29,6 +29,9 @@ const MinePage = () => {
   const [myVideos, setMyVideos] = useState<UserVideo[]>([])
   const [composedVideos, setComposedVideos] = useState<UserVideo[]>([])
   const [characters, setCharacters] = useState<CharacterItem[]>([])
+  const [hasCheckedIn, setHasCheckedIn] = useState<boolean>(false)
+  const [checkinDays, setCheckinDays] = useState<number>(0)
+  const [checkinLoading, setCheckinLoading] = useState<boolean>(false)
 
   // 页面加载时获取用户信息
   useEffect(() => {
@@ -53,9 +56,57 @@ const MinePage = () => {
     // 加载卡通形象
     setCharacters(getAllCharacters())
 
+    // 加载签到状态
+    loadCheckinStatus()
+
     // 模拟加载用户视频数据
     loadUserVideos()
   }, [])
+
+  // 加载签到状态
+  const loadCheckinStatus = () => {
+    setHasCheckedIn(hasCheckedInToday())
+    setCheckinDays(getCheckinDays())
+  }
+
+  // 处理签到
+  const handleCheckin = () => {
+    if (checkinLoading) return
+
+    setCheckinLoading(true)
+
+    try {
+      const result = dailyCheckin()
+
+      if (result.success) {
+        // 签到成功
+        Taro.showToast({
+          title: `${result.message}`,
+          icon: 'success',
+          duration: 2000
+        })
+
+        // 更新状态
+        loadCheckinStatus()
+        setUserPoints(result.totalPoints)
+        setLevelInfo(getUserLevel())
+      } else {
+        // 今日已签到
+        Taro.showToast({
+          title: result.message,
+          icon: 'none'
+        })
+      }
+    } catch (error) {
+      console.error('签到失败:', error)
+      Taro.showToast({
+        title: '签到失败，请重试',
+        icon: 'none'
+      })
+    } finally {
+      setCheckinLoading(false)
+    }
+  }
 
   // 加载用户视频数据
   const loadUserVideos = () => {
@@ -118,6 +169,47 @@ const MinePage = () => {
           onClick={handleLogout}
         >
           <Text className="block text-orange-500 text-sm">退出</Text>
+        </View>
+      </View>
+
+      {/* 每日签到卡片 */}
+      <View className="bg-gradient-to-br from-orange-400 to-yellow-400 rounded-2xl p-5 mb-6 shadow-lg border-2 border-orange-300">
+        <View className="flex items-center justify-between mb-4">
+          <View>
+            <Text className="block text-white font-bold text-lg">每日签到</Text>
+            <Text className="block text-white/80 text-sm mt-1">
+              {hasCheckedIn ? '今日已签到' : '点击签到获取积分'}
+            </Text>
+          </View>
+          <View className="bg-white/20 rounded-full px-4 py-2">
+            <Text className="block text-white font-bold text-base">
+              连续 {checkinDays} 天
+            </Text>
+          </View>
+        </View>
+
+        {hasCheckedIn ? (
+          <View className="bg-white/20 rounded-2xl p-4 flex items-center justify-center">
+            <Text className="block text-3xl mr-2">✅</Text>
+            <Text className="block text-white font-bold text-base">今日已完成签到</Text>
+          </View>
+        ) : (
+          <View
+            className="bg-white rounded-2xl py-4 flex items-center justify-center shadow-md active:scale-95 transition-transform"
+            onClick={handleCheckin}
+          >
+            <Text className="block text-2xl mr-2">🎁</Text>
+            <Text className="block text-orange-500 font-bold text-lg">
+              {checkinLoading ? '签到中...' : '立即签到 +2 积分'}
+            </Text>
+          </View>
+        )}
+
+        {/* 签到提示 */}
+        <View className="mt-3 flex items-center justify-center">
+          <Text className="block text-white/90 text-xs">
+            每日签到可获得 2 积分，连续签到更有惊喜！
+          </Text>
         </View>
       </View>
 
