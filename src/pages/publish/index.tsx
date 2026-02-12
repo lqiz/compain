@@ -173,15 +173,15 @@ const PublishPage = () => {
     <View className="min-h-screen bg-orange-50 flex flex-col">
       <CountdownBar />
 
-      <View className="p-5 flex-1 pb-20">
+      <View className="p-5 flex-1 pb-20 pt-4">
         {/* 顶部操作栏 */}
         <View className="flex items-center mb-6">
           {/* 返回按钮 */}
           <View
-            className="bg-white border border-orange-200 rounded-full px-4 py-2"
+            className="bg-white border border-orange-200 rounded-full px-4 py-2 shadow-sm"
             onClick={handleBack}
           >
-            <Text className="block text-orange-500 text-sm">← 返回</Text>
+            <Text className="block text-orange-500 text-sm font-semibold">← 返回</Text>
           </View>
 
           {/* 页面标题 */}
@@ -192,10 +192,10 @@ const PublishPage = () => {
 
           {/* 退出按钮 */}
           <View
-            className="bg-white border border-orange-200 rounded-full px-4 py-2"
+            className="bg-white border border-orange-200 rounded-full px-4 py-2 shadow-sm"
             onClick={handleLogout}
           >
-            <Text className="block text-orange-500 text-sm">退出</Text>
+            <Text className="block text-orange-500 text-sm font-semibold">退出</Text>
           </View>
         </View>
 
