@@ -26,6 +26,7 @@ const IndexPage = () => {
   const [loading, setLoading] = useState<boolean>(true)
   const [countdown, setCountdown] = useState<number>(0)
   const [currentRound, setCurrentRound] = useState<number>(1)
+  const [rulesVisible, setRulesVisible] = useState<boolean>(false)
 
   // 页面加载时获取用户信息和数据
   useEffect(() => {
@@ -360,17 +361,112 @@ const IndexPage = () => {
               backdropFilter: 'blur(5px)'
             }}
           >
-            <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <Text className="block text-white font-bold text-xl">
-                {formatTime(countdown)}
-              </Text>
-              <Text className="block text-white/80 text-xs mt-0.5">
-                第 {currentRound} 场
+            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '8px' }}>
+              <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Text className="block text-white font-bold text-xl">
+                  {formatTime(countdown)}
+                </Text>
+                <Text className="block text-white/80 text-xs mt-0.5">
+                  第 {currentRound} 场
+                </Text>
+              </View>
+
+              {/* 规则说明图标 */}
+              <Text
+                className="text-lg cursor-pointer"
+                style={{
+                  opacity: 0.9,
+                  marginTop: '-4px'
+                }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setRulesVisible(true)
+                }}
+              >
+                ⚠️
               </Text>
             </View>
           </View>
         </View>
       </View>
+
+      {/* 规则说明弹窗 */}
+      {rulesVisible && (
+        <View
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+          }}
+          onClick={() => setRulesVisible(false)}
+        >
+          <View
+            style={{
+              backgroundColor: '#fff',
+              borderRadius: '24px',
+              padding: '24px',
+              maxWidth: '320px',
+              width: '100%',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 弹窗标题 */}
+            <View style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
+              <Text className="text-2xl mr-2">⚠️</Text>
+              <Text className="block text-gray-800 font-bold text-xl">诉苦大会规则</Text>
+            </View>
+
+            {/* 规则内容 */}
+            <View style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+              <View style={{ display: 'flex', alignItems: 'flex-start' }}>
+                <Text className="block text-sky-500 font-bold text-sm mr-2" style={{ marginTop: '2px' }}>•</Text>
+                <Text className="block text-gray-700 text-sm flex-1">每场诉苦大会持续1小时</Text>
+              </View>
+              <View style={{ display: 'flex', alignItems: 'flex-start' }}>
+                <Text className="block text-sky-500 font-bold text-sm mr-2" style={{ marginTop: '2px' }}>•</Text>
+                <Text className="block text-gray-700 text-sm flex-1">发布视频可获得5积分奖励</Text>
+              </View>
+              <View style={{ display: 'flex', alignItems: 'flex-start' }}>
+                <Text className="block text-sky-500 font-bold text-sm mr-2" style={{ marginTop: '2px' }}>•</Text>
+                <Text className="block text-gray-700 text-sm flex-1">每日签到可获得额外积分</Text>
+              </View>
+              <View style={{ display: 'flex', alignItems: 'flex-start' }}>
+                <Text className="block text-sky-500 font-bold text-sm mr-2" style={{ marginTop: '2px' }}>•</Text>
+                <Text className="block text-gray-700 text-sm flex-1">积分可以提升你的等级</Text>
+              </View>
+              <View style={{ display: 'flex', alignItems: 'flex-start' }}>
+                <Text className="block text-sky-500 font-bold text-sm mr-2" style={{ marginTop: '2px' }}>•</Text>
+                <Text className="block text-gray-700 text-sm flex-1">禁止发布不当内容</Text>
+              </View>
+              <View style={{ display: 'flex', alignItems: 'flex-start' }}>
+                <Text className="block text-pink-500 font-bold text-sm mr-2" style={{ marginTop: '2px' }}>⚠️</Text>
+                <Text className="block text-pink-600 text-sm flex-1">仅限15岁以下小朋友参与</Text>
+              </View>
+            </View>
+
+            {/* 关闭按钮 */}
+            <View
+              style={{
+                backgroundColor: 'linear-gradient(135deg, #FFB74D 0%, #FF8A65 50%, #FF8A80 100%)',
+                borderRadius: '16px',
+                padding: '12px'
+              }}
+              onClick={() => setRulesVisible(false)}
+            >
+              <Text className="block text-white font-bold text-center text-base">我知道了</Text>
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   )
 }

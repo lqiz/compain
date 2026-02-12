@@ -19,8 +19,8 @@ export default defineAppConfig({
     borderStyle: 'white',
     list: [
       { pagePath: 'pages/index/index', text: '全部' },
-      { pagePath: 'pages/mine/index', text: '我的' },
-      { pagePath: 'pages/activity/index', text: '活动' }
+      { pagePath: 'pages/activity/index', text: '活动' },
+      { pagePath: 'pages/mine/index', text: '我的' }
     ]
   }
 })
