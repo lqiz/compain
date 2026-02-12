@@ -2,7 +2,7 @@ import { View, Text, Video, Textarea, Button } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState } from 'react'
 import { Network } from '@/network'
-import { getUserNickname, getUserAge, logout, addUserPoints, POINTS_RULES } from '@/utils/auth'
+import { getUserNickname, getUserAge, addUserPoints, POINTS_RULES } from '@/utils/auth'
 
 const PublishPage = () => {
   const [videoPath, setVideoPath] = useState<string>('')
@@ -156,18 +156,6 @@ const PublishPage = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
-  const handleLogout = () => {
-    Taro.showModal({
-      title: '提示',
-      content: '确定要退出登录吗？',
-      success: (res) => {
-        if (res.confirm) {
-          logout()
-        }
-      }
-    })
-  }
-
   return (
     <View className="min-h-screen bg-orange-50 flex flex-col">
       {/* 内容区域 */}
@@ -187,14 +175,6 @@ const PublishPage = () => {
           <View className="flex-1 ml-4">
             <Text className="block text-xl font-bold text-gray-800">发布心里话</Text>
             <Text className="block text-gray-500 text-xs">孩子的心里话，我们来发布</Text>
-          </View>
-
-          {/* 退出按钮 */}
-          <View
-            className="bg-white border border-orange-200 rounded-full px-4 py-2 shadow-sm"
-            onClick={handleLogout}
-          >
-            <Text className="block text-orange-500 text-sm font-semibold">退出</Text>
           </View>
         </View>
 
