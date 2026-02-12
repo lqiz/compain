@@ -25,6 +25,12 @@
 - **边框**：`border-orange-200`
 - **分割线**：`border-gray-200`
 
+### 等级色
+- **青铜**：`bg-amber-700` / `text-amber-700`
+- **白银**：`bg-gray-300` / `text-gray-600`
+- **黄金**：`bg-yellow-400` / `text-yellow-500`
+- **铂金**：`bg-cyan-400` / `text-cyan-500`
+
 ### 语义色
 - **成功**：`text-green-500` / `bg-green-500`
 - **警告**：`text-yellow-500` / `bg-yellow-500`
@@ -54,6 +60,7 @@
 - **页面水平边距**：`px-5` (20px)
 - **页面垂直边距**：`py-5` (20px)
 - **安全区域**：`safe-area-inset`（适配刘海屏）
+- **底部导航预留**：`pb-20` (80px) - 避开 TabBar
 
 ### 组件间距
 - **组件间距（小）**：`gap-3` (12px)
@@ -68,7 +75,76 @@
 
 ## 组件规范
 
-### 按钮
+### 倒计时组件（左上角）
+```tsx
+<View className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm z-50 px-5 py-3">
+  <View className="flex items-center justify-between">
+    <View className="flex items-center">
+      <Text className="block text-2xl mr-2">⏰</Text>
+      <View>
+        <Text className="block text-gray-800 font-semibold text-sm">
+          本场结束倒计时
+        </Text>
+        <Text className="block text-orange-500 font-bold text-xl">
+          {formatTime(countdown)}
+        </Text>
+      </View>
+    </View>
+    <View className="bg-orange-100 rounded-full px-3 py-1">
+      <Text className="block text-orange-600 text-xs">
+        第 {currentRound} 场
+      </Text>
+    </View>
+  </View>
+</View>
+```
+
+### 等级徽章
+```tsx
+{/* 青铜等级 */}
+<View className="bg-amber-700 rounded-full px-3 py-1">
+  <Text className="block text-white text-xs font-semibold">🥉 青铜</Text>
+</View>
+
+{/* 白银等级 */}
+<View className="bg-gray-300 rounded-full px-3 py-1">
+  <Text className="block text-gray-700 text-xs font-semibold">🥈 白银</Text>
+</View>
+
+{/* 黄金等级 */}
+<View className="bg-yellow-400 rounded-full px-3 py-1">
+  <Text className="block text-yellow-900 text-xs font-semibold">🥇 黄金</Text>
+</View>
+
+{/* 铂金等级 */}
+<View className="bg-cyan-400 rounded-full px-3 py-1">
+  <Text className="block text-cyan-900 text-xs font-semibold">💎 铂金</Text>
+</View>
+```
+
+### 积分进度条
+```tsx
+<View className="bg-white border-2 border-orange-200 rounded-2xl p-4 mb-4">
+  <View className="flex justify-between items-center mb-2">
+    <Text className="block text-gray-800 font-semibold text-base">我的等级</Text>
+    <View className="flex items-center">
+      <Text className="block text-gray-600 text-sm mr-2">{points} 积分</Text>
+      <LevelBadge level={level} />
+    </View>
+  </View>
+  <View className="w-full h-3 bg-orange-100 rounded-full overflow-hidden">
+    <View
+      className="h-full bg-orange-500 transition-all"
+      style={{ width: `${progressPercent}%` }}
+    />
+  </View>
+  <Text className="block text-gray-500 text-xs mt-2">
+    再获得 {nextLevelPoints - points} 积分升级到 {nextLevelName}
+  </Text>
+</View>
+```
+
+### 按钮规范
 ```tsx
 {/* 主按钮 - 温暖橙色 */}
 <View className="bg-orange-500 rounded-2xl px-6 py-3 shadow-sm">
@@ -86,7 +162,7 @@
 </View>
 ```
 
-### 卡片
+### 卡片规范
 ```tsx
 {/* 诉苦卡片 */}
 <View className="bg-white rounded-2xl p-5 shadow-sm mb-4">
@@ -104,9 +180,37 @@
     妈妈总是逼我吃胡萝卜，我真的很讨厌！
   </Text>
 </View>
+
+{/* 合成视频卡片 */}
+<View className="bg-white rounded-2xl p-5 shadow-sm mb-4 border-2 border-purple-200">
+  <View className="flex items-center justify-between mb-3">
+    <View className="flex items-center">
+      <Text className="block text-2xl mr-2">🎬</Text>
+      <Text className="block text-purple-600 font-semibold text-sm">合成视频</Text>
+    </View>
+    <View className="bg-purple-100 rounded-full px-2 py-1">
+      <Text className="block text-purple-700 text-xs">
+        包含 {videoCount} 个小朋友的诉苦
+      </Text>
+    </View>
+  </View>
+
+  <View className="aspect-[9/16] bg-gray-100 rounded-xl overflow-hidden mb-3">
+    <Video src={videoUrl} className="w-full h-full" controls />
+  </View>
+
+  <View className="flex items-center justify-between">
+    <Text className="block text-gray-500 text-xs">
+      已分享到抖音
+    </Text>
+    <Text className="block text-gray-500 text-xs">
+      {publishTime}
+    </Text>
+  </View>
+</View>
 ```
 
-### 输入框
+### 输入框规范
 ```tsx
 {/* 温暖风格输入框 */}
 <View className="bg-white border-2 border-orange-200 rounded-2xl px-4 py-3 mb-4">
@@ -116,33 +220,25 @@
     placeholderClass="text-gray-400"
   />
 </View>
-```
 
-### 年龄选择器
-```tsx
-{/* 年龄选择 - 数字轮盘风格 */}
-<View className="bg-white border-2 border-orange-200 rounded-2xl p-5 mb-4">
-  <Text className="block text-gray-800 font-semibold text-base mb-4 text-center">
-    选择你的年龄
-  </Text>
-
-  <View className="flex justify-center items-center gap-4">
-    <Text className="block text-gray-600 text-3xl">-</Text>
-
-    <View className="w-20 h-20 bg-orange-100 rounded-2xl flex items-center justify-center">
-      <Text className="block text-orange-500 font-bold text-4xl">{age}</Text>
-    </View>
-
-    <Text className="block text-gray-600 text-3xl">+</Text>
+{/* 文本域 */}
+<View className="bg-white border-2 border-orange-200 rounded-2xl px-4 py-3 mb-4">
+  <Textarea
+    className="w-full bg-transparent text-gray-800 placeholder-gray-400 text-base min-h-[150px]"
+    placeholder="分享你的心里话..."
+    placeholderClass="text-gray-400"
+    value={content}
+    onInput={(e) => setContent(e.detail.value)}
+    maxlength={500}
+    autoHeight
+  />
+  <View className="flex justify-end">
+    <Text className="block text-gray-400 text-xs">{content.length}/500</Text>
   </View>
-
-  <Text className="block text-gray-500 text-xs text-center mt-4">
-    年龄必须是 1-15 岁之间哦
-  </Text>
 </View>
 ```
 
-### 空状态
+### 空状态规范
 ```tsx
 <View className="flex flex-col items-center justify-center py-12">
   <Text className="block text-6xl mb-4">📢</Text>
@@ -151,7 +247,7 @@
 </View>
 ```
 
-### 提示框
+### 提示框规范
 ```tsx
 {/* 温馨提示 */}
 <View className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-4">
@@ -164,27 +260,47 @@
 
 ## 导航结构
 
-### 应用配置
+### TabBar 配置
 ```typescript
 // src/app.config.ts
 export default defineAppConfig({
   pages: [
     'pages/login/index',
     'pages/index/index',
+    'pages/mine/index',
+    'pages/activity/index'
   ],
-  window: {
-    backgroundTextStyle: 'light',
-    navigationBarBackgroundColor: '#fff7ed',
-    navigationBarTitleText: '诉苦大会',
-    navigationBarTextStyle: 'black'
+  tabBar: {
+    color: '#666666',
+    selectedColor: '#f97316', // 橙色
+    backgroundColor: '#ffffff',
+    borderStyle: 'white',
+    list: [
+      { pagePath: 'pages/index/index', text: '全部' },
+      { pagePath: 'pages/mine/index', text: '我的' },
+      { pagePath: 'pages/activity/index', text: '活动' }
+    ]
   }
 })
 ```
 
 ### 页面跳转规范
 - 登录页 → 首页：`Taro.redirectTo({ url: '/pages/index/index' })`
-- 首页 → 登录页：`Taro.redirectTo({ url: '/pages/login/index' })`
+- TabBar 页面切换：`Taro.switchTab({ url: '/pages/index/index' })`
 - 未登录跳转：`Taro.redirectTo` 替换当前页面
+
+## 等级系统
+
+### 等级规则
+- **青铜**：初始等级，0 积分
+- **白银**：150 积分
+- **黄金**：250 积分
+- **铂金**：400 积分
+
+### 积分规则
+- 发布视频：+10 积分
+- 视频被合成：+20 积分
+- 每日签到：+5 积分
 
 ## 特殊组件
 
@@ -232,6 +348,9 @@ export default defineAppConfig({
 - ✨（亮点）
 - 💬（评论）
 - ❤️（点赞）
+- ⏰（倒计时）
+- 🎬（合成视频）
+- 🥉🥈🥇💎（等级徽章）
 
 ### 图标使用
 - 使用 Text 组件展示表情符号

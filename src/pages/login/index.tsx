@@ -40,6 +40,7 @@ const LoginPage = () => {
       Taro.setStorageSync('isLoggedIn', true)
       Taro.setStorageSync('userAge', age)
       Taro.setStorageSync('userNickname', `小朋友${age}岁`)
+      Taro.setStorageSync('userPoints', 0) // 初始化积分为 0
 
       setLoading(false)
 

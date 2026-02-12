@@ -1,0 +1,258 @@
+import { View, Text, Video } from '@tarojs/components'
+import Taro from '@tarojs/taro'
+import { useState, useEffect } from 'react'
+import { getUserNickname, getUserAge, getUserPoints, getUserLevel, logout } from '@/utils/auth'
+import { getLevelDisplayText, getLevelBadgeClass } from '@/utils/level'
+
+interface UserVideo {
+  id: string
+  title: string
+  videoUrl: string
+  createdAt: string
+  isComposed: boolean
+  composedWith?: string[]
+}
+
+const MinePage = () => {
+  const [userNickname, setUserNickname] = useState<string>('')
+  const [userAge, setUserAge] = useState<number>(0)
+  const [userPoints, setUserPoints] = useState<number>(0)
+  const [levelInfo, setLevelInfo] = useState<any>(null)
+  const [myVideos, setMyVideos] = useState<UserVideo[]>([])
+  const [composedVideos, setComposedVideos] = useState<UserVideo[]>([])
+
+  // 页面加载时获取用户信息
+  useEffect(() => {
+    const nickname = getUserNickname()
+    const age = getUserAge()
+    const points = getUserPoints()
+    const level = getUserLevel()
+
+    if (!nickname || !age) {
+      // 未登录，跳转到登录页
+      Taro.redirectTo({
+        url: '/pages/login/index'
+      })
+      return
+    }
+
+    setUserNickname(nickname)
+    setUserAge(age)
+    setUserPoints(points)
+    setLevelInfo(level)
+
+    // 模拟加载用户视频数据
+    loadUserVideos()
+  }, [])
+
+  // 加载用户视频数据
+  const loadUserVideos = () => {
+    // 这里应该从后端API获取用户发布的视频
+    // 暂时使用模拟数据
+    const mockVideos: UserVideo[] = [
+      {
+        id: '1',
+        title: '妈妈总是逼我吃胡萝卜',
+        videoUrl: '',
+        createdAt: '2024-01-15',
+        isComposed: false
+      }
+    ]
+
+    const mockComposedVideos: UserVideo[] = [
+      {
+        id: '2',
+        title: '第1场合成视频',
+        videoUrl: '',
+        createdAt: '2024-01-14',
+        isComposed: true,
+        composedWith: ['小明', '小红', '小刚']
+      }
+    ]
+
+    setMyVideos(mockVideos)
+    setComposedVideos(mockComposedVideos)
+  }
+
+  // 退出登录
+  const handleLogout = () => {
+    Taro.showModal({
+      title: '提示',
+      content: '确定要退出登录吗？',
+      success: (res) => {
+        if (res.confirm) {
+          logout()
+        }
+      }
+    })
+  }
+
+  return (
+    <View className="min-h-screen bg-orange-50 p-5 pb-20">
+      {/* 用户信息头部 */}
+      <View className="flex items-center justify-between mb-6">
+        <View className="flex items-center">
+          <View className="w-16 h-16 bg-orange-200 rounded-full mr-4 flex items-center justify-center">
+            <Text className="block text-orange-500 font-bold text-2xl">{userAge}</Text>
+          </View>
+          <View>
+            <Text className="block text-gray-800 font-bold text-xl mb-1">{userNickname}</Text>
+            <Text className="block text-gray-500 text-sm">{userAge}岁 · 诉苦大会</Text>
+          </View>
+        </View>
+
+        <View
+          className="bg-white border border-orange-200 rounded-full px-4 py-2"
+          onClick={handleLogout}
+        >
+          <Text className="block text-orange-500 text-sm">退出</Text>
+        </View>
+      </View>
+
+      {/* 等级信息卡片 */}
+      {levelInfo && (
+        <View className="bg-white border-2 border-orange-200 rounded-2xl p-5 mb-6 shadow-sm">
+          <View className="flex justify-between items-center mb-3">
+            <Text className="block text-gray-800 font-semibold text-base">我的等级</Text>
+            <View className={`${getLevelBadgeClass(levelInfo.level)} rounded-full px-3 py-1`}>
+              <Text className="block text-xs font-semibold">
+                {getLevelDisplayText(levelInfo.level)}
+              </Text>
+            </View>
+          </View>
+
+          <View className="flex justify-between items-center mb-3">
+            <View>
+              <Text className="block text-gray-500 text-xs">当前积分</Text>
+              <Text className="block text-orange-500 font-bold text-2xl">{userPoints}</Text>
+            </View>
+            {levelInfo.pointsToNextLevel > 0 && (
+              <View className="text-right">
+                <Text className="block text-gray-500 text-xs">升级还需</Text>
+                <Text className="block text-gray-600 font-semibold">{levelInfo.pointsToNextLevel} 积分</Text>
+              </View>
+            )}
+          </View>
+
+          {levelInfo.pointsToNextLevel > 0 && (
+            <View className="w-full h-3 bg-orange-100 rounded-full overflow-hidden">
+              <View
+                className="h-full bg-orange-500 transition-all"
+                style={{ width: `${levelInfo.progressPercent}%` }}
+              />
+            </View>
+          )}
+
+          {levelInfo.pointsToNextLevel === 0 && (
+            <View className="bg-gradient-to-r from-cyan-400 to-purple-500 rounded-xl p-3 mt-3">
+              <Text className="block text-white text-center font-semibold text-sm">
+                🎉 恭喜你已达到最高等级！
+              </Text>
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* 我发布的视频 */}
+      <View className="mb-6">
+        <View className="flex items-center justify-between mb-4">
+          <Text className="block text-gray-800 font-bold text-xl">我发布的视频</Text>
+          <View className="bg-orange-100 rounded-full px-3 py-1">
+            <Text className="block text-orange-600 text-xs">{myVideos.length} 个</Text>
+          </View>
+        </View>
+
+        {myVideos.length === 0 ? (
+          <View className="bg-white rounded-2xl p-8 text-center shadow-sm">
+            <Text className="block text-5xl mb-3">📹</Text>
+            <Text className="block text-gray-600 text-base mb-2">还没有发布视频</Text>
+            <Text className="block text-gray-500 text-sm">
+              去&ldquo;全部&rdquo;页面发布你的第一个心里话吧
+            </Text>
+          </View>
+        ) : (
+          <View className="space-y-4">
+            {myVideos.map((video) => (
+              <View key={video.id} className="bg-white rounded-2xl p-4 shadow-sm">
+                <View className="aspect-[9/16] bg-gray-100 rounded-xl overflow-hidden mb-3">
+                  {video.videoUrl ? (
+                    <Video src={video.videoUrl} className="w-full h-full" controls />
+                  ) : (
+                    <View className="w-full h-full flex items-center justify-center">
+                      <Text className="block text-gray-400 text-base">视频预览</Text>
+                    </View>
+                  )}
+                </View>
+                <Text className="block text-gray-800 font-semibold text-base mb-1">{video.title}</Text>
+                <Text className="block text-gray-500 text-xs">{video.createdAt}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+      </View>
+
+      {/* 合成的视频 */}
+      <View className="mb-6">
+        <View className="flex items-center justify-between mb-4">
+          <Text className="block text-gray-800 font-bold text-xl">合成的视频</Text>
+          <View className="bg-purple-100 rounded-full px-3 py-1">
+            <Text className="block text-purple-600 text-xs">{composedVideos.length} 个</Text>
+          </View>
+        </View>
+
+        {composedVideos.length === 0 ? (
+          <View className="bg-white rounded-2xl p-8 text-center shadow-sm">
+            <Text className="block text-5xl mb-3">🎬</Text>
+            <Text className="block text-gray-600 text-base mb-2">还没有合成视频</Text>
+            <Text className="block text-gray-500 text-sm">
+              每小时结束后系统会自动合成视频
+            </Text>
+          </View>
+        ) : (
+          <View className="space-y-4">
+            {composedVideos.map((video) => (
+              <View
+                key={video.id}
+                className="bg-white rounded-2xl p-4 shadow-sm border-2 border-purple-200"
+              >
+                <View className="flex items-center justify-between mb-3">
+                  <View className="flex items-center">
+                    <Text className="block text-2xl mr-2">🎬</Text>
+                    <Text className="block text-purple-600 font-semibold text-sm">合成视频</Text>
+                  </View>
+                  <View className="bg-purple-100 rounded-full px-2 py-1">
+                    <Text className="block text-purple-700 text-xs">
+                      包含 {video.composedWith?.length || 0} 个小朋友
+                    </Text>
+                  </View>
+                </View>
+
+                <View className="aspect-[9/16] bg-gray-100 rounded-xl overflow-hidden mb-3">
+                  {video.videoUrl ? (
+                    <Video src={video.videoUrl} className="w-full h-full" controls />
+                  ) : (
+                    <View className="w-full h-full flex items-center justify-center">
+                      <Text className="block text-gray-400 text-base">视频预览</Text>
+                    </View>
+                  )}
+                </View>
+
+                <View className="flex items-center justify-between">
+                  <Text className="block text-gray-500 text-xs">
+                    {video.createdAt}
+                  </Text>
+                  <View className="flex items-center">
+                    <Text className="block text-green-500 text-xs mr-1">✓</Text>
+                    <Text className="block text-gray-500 text-xs">已分享到抖音</Text>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
+      </View>
+    </View>
+  )
+}
+
+export default MinePage
