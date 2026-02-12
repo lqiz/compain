@@ -1,4 +1,4 @@
-import { View, Text, Video, Input, Textarea, Button } from '@tarojs/components'
+import { View, Text, Video, Textarea, Button } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
 import { Network } from '@/network'
@@ -7,8 +7,7 @@ import { getUserNickname, getUserAge, logout } from '@/utils/auth'
 const IndexPage = () => {
   const [videoPath, setVideoPath] = useState<string>('')
   const [videoDuration, setVideoDuration] = useState<number>(0)
-  const [title, setTitle] = useState<string>('')
-  const [description, setDescription] = useState<string>('')
+  const [content, setContent] = useState<string>('')
   const [uploading, setUploading] = useState<boolean>(false)
   const [uploadProgress, setUploadProgress] = useState<number>(0)
   const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string>('')
@@ -72,9 +71,9 @@ const IndexPage = () => {
       return
     }
 
-    if (!title.trim()) {
+    if (!content.trim()) {
       Taro.showToast({
-        title: '请输入标题',
+        title: '请输入心里话',
         icon: 'none'
       })
       return
@@ -101,8 +100,8 @@ const IndexPage = () => {
         filePath: videoPath,
         name: 'video',
         formData: {
-          title: title,
-          description: description
+          title: content,
+          description: ''
         }
       })
 
@@ -117,8 +116,7 @@ const IndexPage = () => {
       if (response.code === 200) {
         setUploadedVideoUrl(response.data.videoUrl)
         setVideoPath('')
-        setTitle('')
-        setDescription('')
+        setContent('')
         setUploadProgress(100)
 
         Taro.showToast({
@@ -241,34 +239,22 @@ const IndexPage = () => {
         </View>
       )}
 
-      {/* 标题输入 */}
-      <View className="mb-4">
-        <Text className="block text-gray-800 font-semibold text-base mb-2">标题</Text>
-        <View className="bg-white border-2 border-orange-200 rounded-2xl px-4 py-3">
-          <Input
-            className="w-full bg-transparent text-gray-800 placeholder-gray-400 text-base"
-            placeholder="给你的心里话起个标题吧"
-            placeholderClass="text-gray-400"
-            value={title}
-            onInput={(e) => setTitle(e.detail.value)}
-            maxlength={50}
-          />
-        </View>
-      </View>
-
-      {/* 描述输入 */}
-      <View className="mb-6">
-        <Text className="block text-gray-800 font-semibold text-base mb-2">详细描述</Text>
-        <View className="bg-white border-2 border-orange-200 rounded-2xl px-4 py-3">
+      {/* 心里话输入 */}
+      <View className="mb-6 flex-1">
+        <Text className="block text-gray-800 font-semibold text-base mb-2">你的心里话</Text>
+        <View className="bg-white border-2 border-orange-200 rounded-2xl px-4 py-3 flex-1">
           <Textarea
-            className="w-full bg-transparent text-gray-800 placeholder-gray-400 text-base"
-            placeholder="分享你的心里话..."
+            className="w-full bg-transparent text-gray-800 placeholder-gray-400 text-base min-h-[150px]"
+            placeholder="分享你的心里话，想说什么就说什么..."
             placeholderClass="text-gray-400"
-            value={description}
-            onInput={(e) => setDescription(e.detail.value)}
-            maxlength={200}
+            value={content}
+            onInput={(e) => setContent(e.detail.value)}
+            maxlength={500}
             autoHeight
           />
+          <View className="flex justify-end">
+            <Text className="block text-gray-400 text-xs">{content.length}/500</Text>
+          </View>
         </View>
       </View>
 
