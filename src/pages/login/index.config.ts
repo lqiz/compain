@@ -1,3 +1,5 @@
 export default typeof definePageConfig === 'function'
-  ? definePageConfig({ navigationBarTitleText: '登录', navigationBarBackgroundColor: '#fff7ed' })
-  : { navigationBarTitleText: '登录', navigationBarBackgroundColor: '#fff7ed' }
+  ? definePageConfig({
+      navigationBarTitleText: '诉苦大会 - 登录'
+    })
+  : { navigationBarTitleText: '诉苦大会 - 登录' }
