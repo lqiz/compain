@@ -1,4 +1,4 @@
-import { View, Text, Video, Button } from '@tarojs/components'
+import { View, Text, Video } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
 import { Network } from '@/network'
@@ -200,22 +200,6 @@ const IndexPage = () => {
   return (
     <View className="min-h-screen bg-gray-50 flex flex-col">
       <View className="flex-1 pb-36">
-        {/* 顶部 */}
-        <View className="px-5 py-5 bg-white shadow-md border-b-3 border-sky-200">
-          <View className="flex justify-between items-center">
-            <View>
-              <Text className="block text-2xl font-bold text-gray-700">📺 全部视频</Text>
-              <Text className="block text-sky-400 text-sm">小朋友们的心里话</Text>
-            </View>
-            <Button
-              className="bg-gradient-to-r from-sky-400 to-blue-400 text-white text-sm px-6 py-3 rounded-3xl shadow-md"
-              onClick={goToPublish}
-            >
-              ✨ 发布
-            </Button>
-          </View>
-        </View>
-
         {loading ? (
           <View className="flex items-center justify-center py-20">
             <Text className="block text-sky-400 text-lg">🌈 加载中...</Text>
@@ -223,7 +207,7 @@ const IndexPage = () => {
         ) : (
           <>
             {/* 视频列表 */}
-            <View className="p-5 space-y-5">
+            <View className="p-5 space-y-5 pt-6">
               {videoList.map(video => (
                 <View
                   key={video.id}
@@ -328,17 +312,17 @@ const IndexPage = () => {
       <View
         style={{
           position: 'fixed',
-          right: '16px',
+          right: '12px',
           bottom: '60px',
           zIndex: 100,
           display: 'flex',
           flexDirection: 'column',
-          gap: '12px'
+          gap: '8px'
         }}
       >
         {/* 开始诉苦按钮 */}
         <View
-          className="bg-gradient-to-r from-orange-400 via-orange-500 to-pink-500 rounded-full px-8 py-5 shadow-2xl border-3 border-orange-300"
+          className="bg-gradient-to-r from-orange-400 via-orange-500 to-pink-500 rounded-full px-5 py-3 shadow-xl border-2 border-orange-300"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -350,17 +334,17 @@ const IndexPage = () => {
         >
           <View
             style={{
-              width: '52px',
-              height: '52px',
+              width: '40px',
+              height: '40px',
               borderRadius: '50%',
               backgroundColor: 'rgba(255, 255, 255, 0.3)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              marginRight: '16px'
+              marginRight: '12px'
             }}
           >
-            <Text className="text-3xl">📹</Text>
+            <Text className="text-2xl">📹</Text>
           </View>
 
           <View
@@ -368,42 +352,28 @@ const IndexPage = () => {
               flex: 1
             }}
           >
-            <Text className="block text-white font-bold text-xl">开始诉苦</Text>
-            <Text className="block text-white/90 text-xs mt-1">发布你的心里话</Text>
+            <Text className="block text-white font-bold text-lg">开始诉苦</Text>
+            <Text className="block text-white/90 text-xs mt-0.5">发布你的心里话</Text>
           </View>
 
           {/* 倒计时显示 */}
           <View
             style={{
               backgroundColor: 'rgba(255, 255, 255, 0.25)',
-              borderRadius: '20px',
-              padding: '8px 16px',
+              borderRadius: '16px',
+              padding: '6px 12px',
               backdropFilter: 'blur(5px)'
             }}
           >
             <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <Text className="block text-white font-bold text-2xl">
+              <Text className="block text-white font-bold text-xl">
                 {formatTime(countdown)}
               </Text>
-              <Text className="block text-white/80 text-xs mt-1">
+              <Text className="block text-white/80 text-xs mt-0.5">
                 第 {currentRound} 场
               </Text>
             </View>
           </View>
-        </View>
-
-        {/* 提示文字 */}
-        <View
-          style={{
-            backgroundColor: 'rgba(255, 183, 77, 0.9)',
-            borderRadius: '20px',
-            padding: '8px 16px',
-            boxShadow: '0 4px 12px rgba(255, 138, 101, 0.3)'
-          }}
-        >
-          <Text className="block text-white text-xs text-center font-medium">
-            ⏰ 本场结束倒计时
-          </Text>
         </View>
       </View>
     </View>
