@@ -37,6 +37,13 @@ const PublishPage = () => {
     setUserAge(age)
   })
 
+  // 返回首页
+  const handleBack = () => {
+    Taro.switchTab({
+      url: '/pages/index/index'
+    })
+  }
+
   // 选择视频
   const chooseVideo = async () => {
     try {
@@ -167,18 +174,23 @@ const PublishPage = () => {
       <CountdownBar />
 
       <View className="p-5 flex-1 pb-20">
-        {/* 顶部用户信息 */}
-        <View className="flex justify-between items-center mb-6">
-          <View className="flex items-center">
-            <View className="w-12 h-12 bg-orange-200 rounded-full mr-3 flex items-center justify-center">
-              <Text className="block text-orange-500 font-bold text-xl">{userAge}</Text>
-            </View>
-            <View>
-              <Text className="block text-gray-800 font-semibold text-base">{userNickname}</Text>
-              <Text className="block text-gray-500 text-xs">诉苦大会 · {userAge}岁</Text>
-            </View>
+        {/* 顶部操作栏 */}
+        <View className="flex items-center mb-6">
+          {/* 返回按钮 */}
+          <View
+            className="bg-white border border-orange-200 rounded-full px-4 py-2"
+            onClick={handleBack}
+          >
+            <Text className="block text-orange-500 text-sm">← 返回</Text>
           </View>
 
+          {/* 页面标题 */}
+          <View className="flex-1 ml-4">
+            <Text className="block text-xl font-bold text-gray-800">发布心里话</Text>
+            <Text className="block text-gray-500 text-xs">孩子的心里话，我们来发布</Text>
+          </View>
+
+          {/* 退出按钮 */}
           <View
             className="bg-white border border-orange-200 rounded-full px-4 py-2"
             onClick={handleLogout}
@@ -187,10 +199,15 @@ const PublishPage = () => {
           </View>
         </View>
 
-        {/* 页面标题 */}
-        <View className="mb-6">
-          <Text className="block text-2xl font-bold text-gray-800">发布你的心里话</Text>
-          <Text className="block text-gray-500 text-sm mt-1">孩子的心里话，我们来发布</Text>
+        {/* 用户信息 */}
+        <View className="flex items-center mb-6">
+          <View className="w-12 h-12 bg-orange-200 rounded-full mr-3 flex items-center justify-center">
+            <Text className="block text-orange-500 font-bold text-xl">{userAge}</Text>
+          </View>
+          <View>
+            <Text className="block text-gray-800 font-semibold text-base">{userNickname}</Text>
+            <Text className="block text-gray-500 text-xs">诉苦大会 · {userAge}岁</Text>
+          </View>
         </View>
 
         {/* 温馨提示 */}
