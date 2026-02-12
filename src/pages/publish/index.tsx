@@ -75,15 +75,50 @@ const PublishPage = () => {
     setUploading(true)
     setUploadProgress(0)
 
+    // 声明进度定时器，确保在 finally 中可以清除
+    let progressInterval: NodeJS.Timeout | null = null
+
     try {
       console.log('开始上传视频:', { videoPath, finalContent })
       console.log('当前环境:', Taro.getEnv())
 
+      // 检查视频文件大小
+      let fileSize = 0
+      const env = Taro.getEnv()
+      const isWeapp = env === Taro.ENV_TYPE.WEAPP
+
+      if (isWeapp) {
+        // 小程序环境：使用 getFileInfo 获取文件大小
+        const fileInfo = await Taro.getFileInfo({ filePath: videoPath })
+        // 类型断言，确保是成功结果
+        const successResult = fileInfo as { size: number }
+        fileSize = successResult.size
+        console.log('小程序视频文件大小:', successResult.size, 'bytes')
+      } else {
+        // H5环境：估算文件大小（假设视频时长 * 1MB/秒）
+        // 注意：这是估算值，实际可能不准确
+        fileSize = Math.floor(videoDuration * 1024 * 1024)
+        console.log('H5环境估算视频文件大小:', fileSize, 'bytes')
+      }
+
+      // 检查文件大小限制（100MB）
+      const MAX_FILE_SIZE = 100 * 1024 * 1024
+      if (fileSize > MAX_FILE_SIZE) {
+        throw new Error(`视频文件过大（${Math.round(fileSize / 1024 / 1024)}MB），请选择100MB以内的视频`)
+      }
+
+      console.log('文件大小检查通过:', fileSize / 1024 / 1024, 'MB')
+
+      // 根据文件大小动态计算超时时间（最少60秒，每MB增加2秒）
+      const fileSizeInMB = fileSize / 1024 / 1024
+      const timeoutDuration = Math.max(60000, fileSizeInMB * 2000 + 30000)
+      console.log('动态超时时间:', Math.round(timeoutDuration / 1000), '秒')
+
       // 模拟上传进度 - 改进版本
-      const progressInterval = setInterval(() => {
+      progressInterval = setInterval(() => {
         setUploadProgress(prev => {
           if (prev >= 95) {
-            clearInterval(progressInterval)
+            clearInterval(progressInterval!)
             return 95
           }
           return prev + 5
@@ -91,15 +126,19 @@ const PublishPage = () => {
       }, 200)
 
       // H5 环境下使用完整 URL，小程序使用相对路径
-      const env = Taro.getEnv() as string
-      const isH5 = env.includes('h5') || env.includes('web')
+      // 将 ENV_TYPE 转换为字符串进行比较
+      const envStr = env.toString()
+      const isH5 = envStr === 'h5' || envStr === 'web'
       const uploadUrl = isH5 ? 'http://localhost:3000/api/video/upload' : '/api/video/upload'
 
       console.log('上传URL:', uploadUrl)
 
-      // 添加超时处理
+      // 添加超时处理 - 使用动态超时时间
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('上传超时')), 30000) // 30秒超时
+        setTimeout(() => {
+          console.error('上传超时，等待时间:', timeoutDuration, 'ms')
+          reject(new Error('上传超时'))
+        }, timeoutDuration)
       })
 
       const uploadPromise = Network.uploadFile({
@@ -115,7 +154,11 @@ const PublishPage = () => {
       // 使用 Promise.race 处理超时
       const uploadRes = await Promise.race([uploadPromise, timeoutPromise]) as any
 
-      clearInterval(progressInterval)
+      // 清除进度定时器
+      if (progressInterval) {
+        clearInterval(progressInterval)
+        progressInterval = null
+      }
       setUploadProgress(100)
 
       console.log('上传响应:', uploadRes)
@@ -178,6 +221,11 @@ const PublishPage = () => {
         duration: 3000
       })
     } finally {
+      // 清除进度定时器（确保一定会清除）
+      if (progressInterval) {
+        clearInterval(progressInterval)
+        progressInterval = null
+      }
       setUploading(false)
     }
   }
