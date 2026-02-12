@@ -60,13 +60,14 @@ const IndexPage = () => {
       }
 
       // 使用模拟数据（因为没有获取视频列表的接口）
+      // 注意：videoUrl 应该从后端API获取，这里使用空字符串避免Video组件报错
       setVideoList([
         {
           id: '1',
           nickname: '小明同学',
           age: 10,
           content: '今天作业太多了，写了好久都没写完，感觉好累😢',
-          videoUrl: 'https://via.placeholder.com/360x640/4FC3F7/ffffff?text=Video+1',
+          videoUrl: '', // 实际应从API获取真实视频URL
           likeCount: 128,
           isLiked: false
         },
@@ -75,7 +76,7 @@ const IndexPage = () => {
           nickname: '小红妹妹',
           age: 9,
           content: '妈妈今天给我买了新的画画本，好开心！🎨',
-          videoUrl: 'https://via.placeholder.com/360x640/81C784/ffffff?text=Video+2',
+          videoUrl: '', // 实际应从API获取真实视频URL
           likeCount: 256,
           isLiked: false
         },
@@ -84,7 +85,7 @@ const IndexPage = () => {
           nickname: '小刚哥哥',
           age: 11,
           content: '今天在操场上踢足球，我们队赢了！⚽️',
-          videoUrl: 'https://via.placeholder.com/360x640/FFB74D/ffffff?text=Video+3',
+          videoUrl: '', // 实际应从API获取真实视频URL
           likeCount: 89,
           isLiked: false
         }
@@ -204,12 +205,19 @@ const IndexPage = () => {
 
                   {/* 视频预览 */}
                   <View className="aspect-[9/16] bg-gray-100 rounded-3xl overflow-hidden mb-4 shadow-md">
-                    <Video
-                      src={video.videoUrl}
-                      className="w-full h-full"
-                      controls
-                      objectFit="cover"
-                    />
+                    {video.videoUrl && video.videoUrl.startsWith('http') && !video.videoUrl.includes('placeholder') ? (
+                      <Video
+                        src={video.videoUrl}
+                        className="w-full h-full"
+                        controls
+                        objectFit="cover"
+                      />
+                    ) : (
+                      <View className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-sky-50 to-pink-50">
+                        <Text className="block text-6xl mb-3">🎬</Text>
+                        <Text className="block text-gray-500 text-sm">视频加载中...</Text>
+                      </View>
+                    )}
                   </View>
 
                   {/* 点赞按钮 */}
