@@ -71,7 +71,7 @@ const PublishPage = () => {
     try {
       const res = await Taro.chooseVideo({
         sourceType: ['album', 'camera'],
-        maxDuration: 300,
+        maxDuration: 600, // 增加到10分钟，允许用户选择更长的视频进行剪辑
         camera: 'back',
         compressed: true
       })
@@ -86,11 +86,27 @@ const PublishPage = () => {
       Taro.navigateTo({
         url: `/pages/video-edit/index?videoPath=${encodeURIComponent(res.tempFilePath)}&duration=${res.duration}`
       })
-    } catch (error) {
+    } catch (error: any) {
       console.error('选择视频失败:', error)
+
+      // 根据错误类型给出更友好的提示
+      let errorMessage = '选择视频失败，请重试'
+
+      if (error?.errMsg) {
+        if (error.errMsg.includes('maxDuration')) {
+          errorMessage = '视频时长不能超过10分钟，请选择更短的视频'
+        } else if (error.errMsg.includes('cancel')) {
+          // 用户取消选择，不需要提示
+          return
+        } else if (error.errMsg.includes('no video')) {
+          errorMessage = '未选择视频，请重新选择'
+        }
+      }
+
       Taro.showToast({
-        title: '选择视频失败',
-        icon: 'none'
+        title: errorMessage,
+        icon: 'none',
+        duration: 3000
       })
     }
   }
