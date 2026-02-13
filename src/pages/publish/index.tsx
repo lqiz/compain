@@ -7,6 +7,7 @@ import { getUserNickname, getUserAge, addUserPoints, POINTS_RULES } from '@/util
 const PublishPage = () => {
   const [videoPath, setVideoPath] = useState<string>('')
   const [videoDuration, setVideoDuration] = useState<number>(0)
+  const [videoSize, setVideoSize] = useState<number>(0) // 新增：存储视频文件大小
   const [content, setContent] = useState<string>('')
   const [uploading, setUploading] = useState<boolean>(false)
   const [uploadProgress, setUploadProgress] = useState<number>(0)
@@ -61,9 +62,49 @@ const PublishPage = () => {
         return
       }
 
+      // 检查文件大小
+      let fileSize = 0
+      const env = Taro.getEnv()
+      const isWeapp = env === Taro.ENV_TYPE.WEAPP
+
+      if (isWeapp) {
+        // 小程序环境：使用 getFileInfo 获取文件大小
+        const fileInfo = await Taro.getFileInfo({ filePath: res.tempFilePath })
+        const successResult = fileInfo as { size: number }
+        fileSize = successResult.size
+        console.log('小程序视频文件大小:', fileSize, 'bytes')
+      } else {
+        // H5环境：使用 fetch 获取文件大小
+        try {
+          const response = await fetch(res.tempFilePath)
+          const blob = await response.blob()
+          fileSize = blob.size
+          console.log('H5视频文件大小:', fileSize, 'bytes')
+        } catch (error) {
+          console.error('H5获取文件大小失败:', error)
+          // 如果获取失败，使用时长估算（不推荐）
+          fileSize = Math.floor(res.duration * 1024 * 1024)
+          console.log('H5环境估算视频文件大小:', fileSize, 'bytes')
+        }
+      }
+
+      // 检查文件大小限制（100MB）
+      const MAX_FILE_SIZE = 100 * 1024 * 1024
+      if (fileSize > MAX_FILE_SIZE) {
+        Taro.showToast({
+          title: `视频文件过大（${Math.round(fileSize / 1024 / 1024)}MB），请选择100MB以内的视频`,
+          icon: 'none',
+          duration: 3000
+        })
+        return
+      }
+
+      console.log('文件大小检查通过:', fileSize / 1024 / 1024, 'MB')
+
       // 直接设置视频路径，不再跳转到编辑器
       setVideoPath(res.tempFilePath)
       setVideoDuration(res.duration)
+      setVideoSize(fileSize) // 保存文件大小
 
       Taro.showToast({
         title: '视频已选择',
@@ -130,10 +171,18 @@ const PublishPage = () => {
         fileSize = successResult.size
         console.log('小程序视频文件大小:', successResult.size, 'bytes')
       } else {
-        // H5环境：估算文件大小（假设视频时长 * 1MB/秒）
-        // 注意：这是估算值，实际可能不准确
-        fileSize = Math.floor(videoDuration * 1024 * 1024)
-        console.log('H5环境估算视频文件大小:', fileSize, 'bytes')
+        // H5环境：使用 fetch 获取文件大小
+        try {
+          const response = await fetch(videoPath)
+          const blob = await response.blob()
+          fileSize = blob.size
+          console.log('H5视频文件大小:', fileSize, 'bytes')
+        } catch (error) {
+          console.error('H5获取文件大小失败:', error)
+          // 如果获取失败，使用时长估算
+          fileSize = Math.floor(videoDuration * 1024 * 1024)
+          console.log('H5环境估算视频文件大小:', fileSize, 'bytes')
+        }
       }
 
       // 检查文件大小限制（100MB）
@@ -265,6 +314,17 @@ const PublishPage = () => {
     }
   }
 
+  // 格式化文件大小
+  const formatFileSize = (bytes: number) => {
+    const mb = bytes / 1024 / 1024
+    if (mb >= 1) {
+      return `${mb.toFixed(2)}MB`
+    }
+    const kb = bytes / 1024
+    return `${kb.toFixed(2)}KB`
+  }
+
+  // 格式化时长
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
     const secs = Math.floor(seconds % 60)
@@ -319,7 +379,7 @@ const PublishPage = () => {
                   />
                   <View className="absolute top-2 right-2 bg-black/70 rounded-full px-2 py-0.5">
                     <Text className="block text-white text-xs font-medium">
-                      {formatDuration(videoDuration)}
+                      {formatDuration(videoDuration)} · {formatFileSize(videoSize)}
                     </Text>
                   </View>
                 </View>
@@ -330,6 +390,7 @@ const PublishPage = () => {
                   onClick={() => {
                     setVideoPath('')
                     setVideoDuration(0)
+                    setVideoSize(0)
                   }}
                 >
                   <View
