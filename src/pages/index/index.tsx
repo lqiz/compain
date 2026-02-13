@@ -1,5 +1,5 @@
 import { View, Text, Video, ScrollView } from '@tarojs/components'
-import Taro from '@tarojs/taro'
+import Taro, { useDidShow } from '@tarojs/taro'
 import { useState } from 'react'
 import { Network } from '@/network'
 
@@ -17,8 +17,8 @@ export default function IndexPage() {
   const [videoList, setVideoList] = useState<VideoCard[]>([])
   const [loading, setLoading] = useState(true)
 
-  // 页面加载时获取数据
-  Taro.useLoad(() => {
+  // 页面显示时获取数据（支持TabBar切换刷新）
+  useDidShow(() => {
     loadVideos()
   })
 
