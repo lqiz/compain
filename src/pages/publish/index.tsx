@@ -233,7 +233,9 @@ const PublishPage = () => {
         name: 'video',
         formData: {
           title: finalContent,
-          description: ''
+          description: '',
+          nickname: getUserNickname(), // 传递用户昵称
+          age: getUserAge().toString() // 传递用户年龄
         }
       })
 

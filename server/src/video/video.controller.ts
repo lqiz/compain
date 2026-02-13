@@ -4,6 +4,17 @@ import { memoryStorage } from 'multer'
 import { VideoService } from './video.service'
 import { LLMClient, Config } from 'coze-coding-dev-sdk'
 
+// 定义视频数据接口，避免与 Taro 的 Video 组件冲突
+interface VideoItem {
+  id: string
+  nickname: string
+  age: number
+  content: string
+  videoUrl: string
+  likeCount: number
+  createdAt: Date
+}
+
 @Controller('video')
 export class VideoController {
   constructor(private readonly videoService: VideoService) {}
@@ -52,6 +63,8 @@ export class VideoController {
       startTime?: string
       endTime?: string
       hasEdited?: string
+      nickname?: string
+      age?: string
     }
   ) {
     console.log('收到视频上传请求')
@@ -62,6 +75,10 @@ export class VideoController {
     })
     console.log('视频标题:', body?.title)
     console.log('视频描述:', body?.description)
+    console.log('用户信息:', {
+      nickname: body?.nickname,
+      age: body?.age
+    })
     console.log('剪辑信息:', {
       startTime: body?.startTime,
       endTime: body?.endTime,
@@ -87,19 +104,27 @@ export class VideoController {
     const startTime = body?.hasEdited === 'true' ? parseFloat(body?.startTime || '0') : 0
     const endTime = body?.hasEdited === 'true' ? parseFloat(body?.endTime || '30') : 0
 
-    // 上传视频（暂时上传完整视频，剪辑信息保存在数据库）
-    const videoUrl = await this.videoService.uploadVideo(
+    // 获取用户信息（从前端传递的 formData 中获取）
+    const nickname = body?.nickname || '匿名用户'
+    const age = parseInt(body?.age || '10')
+
+    // 上传视频并保存到数据库
+    const result = await this.videoService.uploadVideo(
       file.buffer,
       file.originalname,
-      file.mimetype
+      file.mimetype,
+      nickname,
+      age,
+      body?.title || ''
     )
 
-    // 返回结果（包含剪辑信息）
+    // 返回结果
     return {
       code: 200,
       msg: 'success',
       data: {
-        videoUrl,
+        videoUrl: result.videoUrl,
+        videoId: result.videoId,
         title: body?.title || '',
         description: body?.description || '',
         startTime,
@@ -172,6 +197,70 @@ export class VideoController {
       code: 200,
       msg: 'success',
       data: rankings
+    }
+  }
+
+  /**
+   * 获取所有视频列表接口
+   * GET /api/video/list
+   *
+   * 返回：
+   * {
+   *   code: 200,
+   *   msg: 'success',
+   *   data: [
+   *     { id: '1', nickname: '小明同学', age: 10, content: '...', videoUrl: '...', likeCount: 128, createdAt: '...' },
+   *     ...
+   *   ]
+   * }
+   */
+  @Get('list')
+  async getAllVideos(): Promise<{ code: number; msg: string; data: VideoItem[] }> {
+    console.log('收到视频列表请求')
+
+    // 获取视频列表
+    const videos = await this.videoService.getAllVideos()
+
+    return {
+      code: 200,
+      msg: 'success',
+      data: videos
+    }
+  }
+
+  /**
+   * 获取指定用户的视频列表接口
+   * GET /api/video/my?nickname=小明同学
+   *
+   * 参数：
+   * - nickname: 用户昵称（必须）
+   *
+   * 返回：
+   * {
+   *   code: 200,
+   *   msg: 'success',
+   *   data: [
+   *     { id: '1', nickname: '小明同学', age: 10, content: '...', videoUrl: '...', likeCount: 128, createdAt: '...' },
+   *     ...
+   *   ]
+   * }
+   */
+  @Get('my')
+  async getUserVideos(@Query('nickname') nickname: string): Promise<{ code: number; msg: string; data: VideoItem[] }> {
+    console.log('收到用户视频请求, nickname:', nickname)
+
+    // 验证参数
+    if (!nickname) {
+      throw new BadRequestException('用户昵称不能为空')
+    }
+
+    // 获取用户视频列表
+    const videos = await this.videoService.getUserVideos(nickname)
+
+    return {
+      code: 200,
+      msg: 'success',
+      data: videos
     }
   }
 

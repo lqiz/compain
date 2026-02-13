@@ -92,6 +92,7 @@ const IndexPage = () => {
 
       console.log('开始加载数据')
 
+      // 获取排名
       const rankingsRes = await Network.request({
         url: '/api/video/rankings',
         method: 'GET'
@@ -103,36 +104,58 @@ const IndexPage = () => {
         setRankings(rankingsRes.data.data)
       }
 
-      // 使用模拟数据
-      setVideoList([
-        {
-          id: '1',
-          nickname: '小明同学',
-          age: 10,
-          content: '今天作业太多了，写了好久都没写完，感觉好累😢',
-          videoUrl: '',
-          likeCount: 128,
+      // 获取视频列表
+      const videosRes = await Network.request({
+        url: '/api/video/list',
+        method: 'GET'
+      })
+
+      console.log('视频列表接口响应:', videosRes)
+
+      if (videosRes.data.code === 200) {
+        const videoListData = videosRes.data.data.map((video: any) => ({
+          id: video.id,
+          nickname: video.nickname,
+          age: video.age,
+          content: video.content,
+          videoUrl: video.videoUrl,
+          likeCount: video.likeCount,
           isLiked: false
-        },
-        {
-          id: '2',
-          nickname: '小红妹妹',
-          age: 9,
-          content: '妈妈今天给我买了新的画画本，好开心！🎨',
-          videoUrl: '',
-          likeCount: 256,
-          isLiked: false
-        },
-        {
-          id: '3',
-          nickname: '小刚哥哥',
-          age: 11,
-          content: '今天在操场上踢足球，我们队赢了！⚽️',
-          videoUrl: '',
-          likeCount: 89,
-          isLiked: false
-        }
-      ])
+        }))
+        setVideoList(videoListData)
+      } else {
+        // 如果接口失败，使用模拟数据
+        console.log('视频列表接口失败，使用模拟数据')
+        setVideoList([
+          {
+            id: '1',
+            nickname: '小明同学',
+            age: 10,
+            content: '今天作业太多了，写了好久都没写完，感觉好累😢',
+            videoUrl: '',
+            likeCount: 128,
+            isLiked: false
+          },
+          {
+            id: '2',
+            nickname: '小红妹妹',
+            age: 9,
+            content: '妈妈今天给我买了新的画画本，好开心！🎨',
+            videoUrl: '',
+            likeCount: 256,
+            isLiked: false
+          },
+          {
+            id: '3',
+            nickname: '小刚哥哥',
+            age: 11,
+            content: '今天在操场上踢足球，我们队赢了！⚽️',
+            videoUrl: '',
+            likeCount: 89,
+            isLiked: false
+          }
+        ])
+      }
 
       console.log('数据加载完成')
     } catch (error) {

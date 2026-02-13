@@ -1,6 +1,7 @@
 import { View, Text, Video } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
+import { Network } from '@/network'
 import { getUserNickname, getUserAge, getUserPoints, getUserLevel, logout, dailyCheckin, hasCheckedInToday, getCheckinDays } from '@/utils/auth'
 import { getLevelDisplayText, getLevelBadgeClass, getAllCharacters } from '@/utils/level'
 
@@ -59,7 +60,57 @@ const MinePage = () => {
     // 加载签到状态
     loadCheckinStatus()
 
-    // 模拟加载用户视频数据
+    // 加载用户视频数据
+    const loadUserVideos = async () => {
+      try {
+        // 从后端API获取用户发布的视频
+        const response = await Network.request({
+          url: '/api/video/my',
+          method: 'GET',
+          data: {
+            nickname
+          }
+        })
+
+        console.log('用户视频接口响应:', response)
+
+        if (response.data.code === 200) {
+          const videos = response.data.data.map((video: any) => ({
+            id: video.id,
+            title: video.content,
+            videoUrl: video.videoUrl,
+            createdAt: new Date(video.createdAt).toLocaleDateString('zh-CN'),
+            isComposed: false
+          }))
+
+          setMyVideos(videos)
+        } else {
+          // 接口失败，使用空列表
+          console.log('用户视频接口失败，使用空列表')
+          setMyVideos([])
+        }
+
+        // 合成的视频暂时保留模拟数据
+        const mockComposedVideos: UserVideo[] = [
+          {
+            id: '2',
+            title: '第1场合成视频',
+            videoUrl: '',
+            createdAt: '2024-01-14',
+            isComposed: true,
+            composedWith: ['小明', '小红', '小刚']
+          }
+        ]
+
+        setComposedVideos(mockComposedVideos)
+      } catch (error) {
+        console.error('加载用户视频失败:', error)
+        // 出错时使用空列表
+        setMyVideos([])
+        setComposedVideos([])
+      }
+    }
+
     loadUserVideos()
   }, [])
 
@@ -106,35 +157,6 @@ const MinePage = () => {
     } finally {
       setCheckinLoading(false)
     }
-  }
-
-  // 加载用户视频数据
-  const loadUserVideos = () => {
-    // 这里应该从后端API获取用户发布的视频
-    // 暂时使用模拟数据
-    const mockVideos: UserVideo[] = [
-      {
-        id: '1',
-        title: '妈妈总是逼我吃胡萝卜',
-        videoUrl: '',
-        createdAt: '2024-01-15',
-        isComposed: false
-      }
-    ]
-
-    const mockComposedVideos: UserVideo[] = [
-      {
-        id: '2',
-        title: '第1场合成视频',
-        videoUrl: '',
-        createdAt: '2024-01-14',
-        isComposed: true,
-        composedWith: ['小明', '小红', '小刚']
-      }
-    ]
-
-    setMyVideos(mockVideos)
-    setComposedVideos(mockComposedVideos)
   }
 
   // 退出登录

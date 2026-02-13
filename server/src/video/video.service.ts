@@ -73,13 +73,23 @@ export class VideoService {
   }
 
   /**
-   * 上传视频到对象存储
+   * 上传视频到对象存储并保存到数据库
    * @param fileBuffer 视频文件 buffer
    * @param originalName 原始文件名
    * @param mimetype 文件类型
-   * @returns 视频的访问 URL
+   * @param nickname 用户昵称
+   * @param age 用户年龄
+   * @param title 视频标题
+   * @returns 视频的访问 URL 和视频 ID
    */
-  async uploadVideo(fileBuffer: Buffer, originalName: string, mimetype: string): Promise<string> {
+  async uploadVideo(
+    fileBuffer: Buffer,
+    originalName: string,
+    mimetype: string,
+    nickname: string,
+    age: number,
+    title: string
+  ): Promise<{ videoUrl: string; videoId: string }> {
     try {
       // 验证文件类型（只允许视频）
       if (!mimetype.startsWith('video/')) {
@@ -116,11 +126,51 @@ export class VideoService {
 
       console.log('生成视频访问 URL 成功')
 
-      return videoUrl
+      // 创建新的视频记录
+      const newVideo: Video = {
+        id: Date.now().toString(),
+        nickname,
+        age,
+        content: title,
+        videoUrl,
+        likeCount: 0,
+        createdAt: new Date()
+      }
+
+      // 保存到内存存储
+      this.videos.unshift(newVideo) // 添加到数组开头
+
+      console.log('视频信息已保存到数据库, videoId:', newVideo.id)
+
+      return {
+        videoUrl,
+        videoId: newVideo.id
+      }
     } catch (error) {
       console.error('视频上传失败:', error)
       throw new BadRequestException(error.message || '视频上传失败')
     }
+  }
+
+  /**
+   * 获取所有视频列表
+   * @returns 视频列表
+   */
+  async getAllVideos(): Promise<Video[]> {
+    console.log('获取视频列表, 视频数量:', this.videos.length)
+    return this.videos
+  }
+
+  /**
+   * 获取指定用户的视频列表
+   * @param nickname 用户昵称
+   * @returns 该用户的视频列表
+   */
+  async getUserVideos(nickname: string): Promise<Video[]> {
+    console.log('获取用户视频, nickname:', nickname)
+    const userVideos = this.videos.filter(v => v.nickname === nickname)
+    console.log('用户视频数量:', userVideos.length)
+    return userVideos
   }
 
   /**
