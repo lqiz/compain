@@ -171,9 +171,6 @@ importers:
       '@types/multer':
         specifier: ^2.0.0
         version: 2.0.0
-      better-sqlite3:
-        specifier: ^11.9.1
-        version: 11.10.0
       coze-coding-dev-sdk:
         specifier: ^0.7.15
         version: 0.7.15(openai@6.16.0(zod@4.3.5))
@@ -182,10 +179,10 @@ importers:
         version: 0.31.8
       drizzle-orm:
         specifier: ^0.45.1
-        version: 0.45.1(@types/better-sqlite3@7.6.13)(better-sqlite3@11.10.0)(pg@8.17.2)
+        version: 0.45.1(@types/better-sqlite3@7.6.13)(better-sqlite3@11.10.0)(pg@8.17.2)(sql.js@1.14.0)
       drizzle-zod:
         specifier: ^0.8.3
-        version: 0.8.3(drizzle-orm@0.45.1(@types/better-sqlite3@7.6.13)(better-sqlite3@11.10.0)(pg@8.17.2))(zod@4.3.5)
+        version: 0.8.3(drizzle-orm@0.45.1(@types/better-sqlite3@7.6.13)(better-sqlite3@11.10.0)(pg@8.17.2)(sql.js@1.14.0))(zod@4.3.5)
       express:
         specifier: 5.2.1
         version: 5.2.1
@@ -198,6 +195,9 @@ importers:
       rxjs:
         specifier: ^7.8.1
         version: 7.8.2
+      sql.js:
+        specifier: ^1.12.0
+        version: 1.14.0
       zod:
         specifier: ^4.3.5
         version: 4.3.5
@@ -208,9 +208,6 @@ importers:
       '@nestjs/schematics':
         specifier: ^10.2.3
         version: 10.2.3(chokidar@3.6.0)(typescript@5.9.3)
-      '@types/better-sqlite3':
-        specifier: ^7.6.13
-        version: 7.6.13
       '@types/express':
         specifier: 5.0.6
         version: 5.0.6
@@ -9381,6 +9378,9 @@ packages:
     resolution: {integrity: sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==}
     engines: {node: '>= 10.x'}
 
+  sql.js@1.14.0:
+    resolution: {integrity: sha512-NXYh+kFqLiYRCNAaHD0PcbjFgXyjuolEKLMk5vRt2DgPENtF1kkNzzMlg42dUk5wIsH8MhUzsRhaUxIisoSlZQ==}
+
   sshpk@1.18.0:
     resolution: {integrity: sha512-2p2KJZTSqQ/I3+HX42EpYOa2l3f8Erv8MWKsy2I9uf4wA7yFIkXRffYdsx86y6z4vHtV8u7g+pPlr8/4ouAxsQ==}
     engines: {node: '>=0.10.0'}
@@ -14874,6 +14874,7 @@ snapshots:
   '@types/better-sqlite3@7.6.13':
     dependencies:
       '@types/node': 22.19.6
+    optional: true
 
   '@types/body-parser@1.19.6':
     dependencies:
@@ -16193,6 +16194,7 @@ snapshots:
     dependencies:
       bindings: 1.5.0
       prebuild-install: 7.1.3
+    optional: true
 
   big-integer@1.6.52: {}
 
@@ -16203,6 +16205,7 @@ snapshots:
   bindings@1.5.0:
     dependencies:
       file-uri-to-path: 1.0.0
+    optional: true
 
   bl@1.2.3:
     dependencies:
@@ -16496,7 +16499,8 @@ snapshots:
     dependencies:
       readdirp: 5.0.0
 
-  chownr@1.1.4: {}
+  chownr@1.1.4:
+    optional: true
 
   chroma-js@2.6.0: {}
 
@@ -16951,6 +16955,7 @@ snapshots:
   decompress-response@6.0.0:
     dependencies:
       mimic-response: 3.1.0
+    optional: true
 
   decompress-tar@4.1.1:
     dependencies:
@@ -17152,15 +17157,16 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.45.1(@types/better-sqlite3@7.6.13)(better-sqlite3@11.10.0)(pg@8.17.2):
+  drizzle-orm@0.45.1(@types/better-sqlite3@7.6.13)(better-sqlite3@11.10.0)(pg@8.17.2)(sql.js@1.14.0):
     optionalDependencies:
       '@types/better-sqlite3': 7.6.13
       better-sqlite3: 11.10.0
       pg: 8.17.2
+      sql.js: 1.14.0
 
-  drizzle-zod@0.8.3(drizzle-orm@0.45.1(@types/better-sqlite3@7.6.13)(better-sqlite3@11.10.0)(pg@8.17.2))(zod@4.3.5):
+  drizzle-zod@0.8.3(drizzle-orm@0.45.1(@types/better-sqlite3@7.6.13)(better-sqlite3@11.10.0)(pg@8.17.2)(sql.js@1.14.0))(zod@4.3.5):
     dependencies:
-      drizzle-orm: 0.45.1(@types/better-sqlite3@7.6.13)(better-sqlite3@11.10.0)(pg@8.17.2)
+      drizzle-orm: 0.45.1(@types/better-sqlite3@7.6.13)(better-sqlite3@11.10.0)(pg@8.17.2)(sql.js@1.14.0)
       zod: 4.3.5
 
   dunder-proto@1.0.1:
@@ -17674,7 +17680,8 @@ snapshots:
 
   exif-parser@0.1.12: {}
 
-  expand-template@2.0.3: {}
+  expand-template@2.0.3:
+    optional: true
 
   express@4.21.2:
     dependencies:
@@ -17854,7 +17861,8 @@ snapshots:
 
   file-type@8.1.0: {}
 
-  file-uri-to-path@1.0.0: {}
+  file-uri-to-path@1.0.0:
+    optional: true
 
   filename-reserved-regex@2.0.0: {}
 
@@ -18116,7 +18124,8 @@ snapshots:
 
   git-clone@0.1.0: {}
 
-  github-from-package@0.0.0: {}
+  github-from-package@0.0.0:
+    optional: true
 
   glob-parent@5.1.2:
     dependencies:
@@ -19302,7 +19311,8 @@ snapshots:
 
   mimic-response@1.0.1: {}
 
-  mimic-response@3.1.0: {}
+  mimic-response@3.1.0:
+    optional: true
 
   min-document@2.19.2:
     dependencies:
@@ -19530,7 +19540,8 @@ snapshots:
 
   mkdir-p@0.0.7: {}
 
-  mkdirp-classic@0.5.3: {}
+  mkdirp-classic@0.5.3:
+    optional: true
 
   mkdirp@0.5.6:
     dependencies:
@@ -19587,7 +19598,8 @@ snapshots:
 
   nanoid@3.3.11: {}
 
-  napi-build-utils@2.0.0: {}
+  napi-build-utils@2.0.0:
+    optional: true
 
   natural-compare@1.4.0: {}
 
@@ -19627,6 +19639,7 @@ snapshots:
   node-abi@3.87.0:
     dependencies:
       semver: 7.7.3
+    optional: true
 
   node-abort-controller@3.1.1: {}
 
@@ -20557,6 +20570,7 @@ snapshots:
       simple-get: 4.0.1
       tar-fs: 2.1.4
       tunnel-agent: 0.6.0
+    optional: true
 
   prelude-ls@1.2.1: {}
 
@@ -21238,13 +21252,15 @@ snapshots:
 
   signal-exit@4.1.0: {}
 
-  simple-concat@1.0.1: {}
+  simple-concat@1.0.1:
+    optional: true
 
   simple-get@4.0.1:
     dependencies:
       decompress-response: 6.0.0
       once: 1.4.0
       simple-concat: 1.0.1
+    optional: true
 
   simple-plist@1.3.1:
     dependencies:
@@ -21330,6 +21346,8 @@ snapshots:
   split-on-first@3.0.0: {}
 
   split2@4.2.0: {}
+
+  sql.js@1.14.0: {}
 
   sshpk@1.18.0:
     dependencies:
@@ -21642,6 +21660,7 @@ snapshots:
       mkdirp-classic: 0.5.3
       pump: 3.0.3
       tar-stream: 2.2.0
+    optional: true
 
   tar-stream@1.6.2:
     dependencies:

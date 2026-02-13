@@ -1,7 +1,7 @@
-import { Injectable, BadRequestException } from '@nestjs/common'
+import { Injectable, BadRequestException, OnModuleInit } from '@nestjs/common'
 import { S3Storage } from 'coze-coding-dev-sdk'
 import { eq, desc } from 'drizzle-orm'
-import db, { videos, NewVideo } from '../db'
+import { getDb, videos, NewVideo, saveDatabase } from '../db'
 
 // 用户信息接口
 interface User {
@@ -10,8 +10,9 @@ interface User {
 }
 
 @Injectable()
-export class VideoService {
+export class VideoService implements OnModuleInit {
   private storage: S3Storage
+  private db: Awaited<ReturnType<typeof getDb>>
 
   // 内存存储：用户列表（暂时保留，后续也可以改为数据库）
   private users: User[] = [
@@ -22,7 +23,14 @@ export class VideoService {
     { nickname: '小强弟弟', points: 150 }
   ]
 
-  constructor() {
+  async onModuleInit() {
+    console.log('初始化 VideoService...')
+
+    // 初始化数据库
+    this.db = await getDb()
+    console.log('VideoService 数据库初始化完成')
+
+    // 初始化对象存储
     console.log('初始化 S3Storage...')
     console.log('COZE_BUCKET_ENDPOINT_URL:', process.env.COZE_BUCKET_ENDPOINT_URL)
     console.log('COZE_BUCKET_NAME:', process.env.COZE_BUCKET_NAME)
@@ -50,7 +58,7 @@ export class VideoService {
   private async ensureSampleData() {
     try {
       // 检查数据库中是否已有数据
-      const existingVideos = await db.select().from(videos).limit(1)
+      const existingVideos = await this.db.select().from(videos).limit(1)
 
       if (existingVideos.length === 0) {
         console.log('初始化示例数据...')
@@ -88,7 +96,7 @@ export class VideoService {
           }
         ]
 
-        await db.insert(videos).values(sampleVideos)
+        await this.db.insert(videos).values(sampleVideos)
         console.log('示例数据初始化完成')
       }
     } catch (error) {
@@ -187,7 +195,7 @@ export class VideoService {
 
       console.log('保存视频信息到数据库...')
       // 保存到数据库
-      await db.insert(videos).values(newVideo)
+      await this.db.insert(videos).values(newVideo)
 
       console.log('✅ 视频信息已保存到数据库, videoId:', newVideo.id)
       console.log('========== 视频上传完成 ==========')
@@ -215,7 +223,7 @@ export class VideoService {
     // 确保示例数据存在
     await this.ensureSampleData()
 
-    const videoList = await db.select().from(videos).orderBy(desc(videos.createdAt))
+    const videoList = await this.db.select().from(videos).orderBy(desc(videos.createdAt))
     console.log('获取视频列表, 视频数量:', videoList.length)
     return videoList
   }
@@ -227,7 +235,7 @@ export class VideoService {
    */
   async getUserVideos(nickname: string): Promise<any[]> {
     console.log('获取用户视频, nickname:', nickname)
-    const userVideos = await db
+    const userVideos = await this.db
       .select()
       .from(videos)
       .where(eq(videos.nickname, nickname))
@@ -245,7 +253,7 @@ export class VideoService {
     console.log('点赞视频, videoId:', videoId)
 
     // 查找视频
-    const videoList = await db.select().from(videos).where(eq(videos.id, videoId))
+    const videoList = await this.db.select().from(videos).where(eq(videos.id, videoId))
 
     if (videoList.length === 0) {
       throw new BadRequestException('视频不存在')
@@ -257,7 +265,7 @@ export class VideoService {
     const newLikeCount = (video.likeCount || 0) + 1
 
     // 更新数据库
-    await db
+    await this.db
       .update(videos)
       .set({ likeCount: newLikeCount })
       .where(eq(videos.id, videoId))
