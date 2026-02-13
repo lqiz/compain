@@ -29,7 +29,7 @@ export class VideoService {
       nickname: '小明同学',
       age: 10,
       content: '今天作业太多了，写了好久都没写完，感觉好累😢',
-      videoUrl: 'https://via.placeholder.com/360x640/f97316/ffffff?text=Video+1',
+      videoUrl: 'https://media.w3.org/2010/05/sintel/trailer.mp4',
       likeCount: 128,
       createdAt: new Date()
     },
@@ -38,7 +38,7 @@ export class VideoService {
       nickname: '小红妹妹',
       age: 9,
       content: '妈妈今天给我买了新的画画本，好开心！🎨',
-      videoUrl: 'https://via.placeholder.com/360x640/f97316/ffffff?text=Video+2',
+      videoUrl: 'https://media.w3.org/2010/05/bunny/trailer.mp4',
       likeCount: 256,
       createdAt: new Date()
     },
@@ -47,7 +47,7 @@ export class VideoService {
       nickname: '小刚哥哥',
       age: 11,
       content: '今天在操场上踢足球，我们队赢了！⚽️',
-      videoUrl: 'https://via.placeholder.com/360x640/f97316/ffffff?text=Video+3',
+      videoUrl: 'https://test-videos.co.uk/videos/matrix/matrix_480p.mov',
       likeCount: 89,
       createdAt: new Date()
     }
