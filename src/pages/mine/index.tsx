@@ -93,6 +93,14 @@ const MinePage = () => {
 
       console.log('用户视频接口响应:', response)
 
+      // 防御性检查：确保 response.data 存在
+      if (!response.data) {
+        console.error('用户视频接口响应数据为空')
+        setMyVideos([])
+        return
+      }
+
+      // 检查响应状态码
       if (response.data.code === 200) {
         const videos = response.data.data.map((video: any) => ({
           id: video.id,
@@ -106,7 +114,7 @@ const MinePage = () => {
         setMyVideos(videos)
       } else {
         // 接口失败，使用空列表
-        console.log('用户视频接口失败，使用空列表')
+        console.log('用户视频接口失败，使用空列表, code:', response.data.code, 'msg:', response.data.msg)
         setMyVideos([])
       }
 

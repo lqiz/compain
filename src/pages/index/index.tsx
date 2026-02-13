@@ -32,6 +32,17 @@ export default function IndexPage() {
         method: 'GET'
       })
 
+      console.log('加载视频响应:', res)
+      console.log('响应数据:', res.data)
+
+      // 防御性检查：确保 res.data 存在
+      if (!res.data) {
+        console.error('响应数据为空')
+        Taro.showToast({ title: '服务器响应异常', icon: 'none' })
+        return
+      }
+
+      // 检查响应状态码
       if (res.data.code === 200) {
         const videos = res.data.data.map((v: any) => ({
           id: v.id,
@@ -43,10 +54,13 @@ export default function IndexPage() {
           isLiked: false
         }))
         setVideoList(videos)
+      } else {
+        console.error('响应状态码异常:', res.data.code, res.data.msg)
+        Taro.showToast({ title: res.data.msg || '加载失败', icon: 'none' })
       }
     } catch (error) {
       console.error('加载视频失败:', error)
-      Taro.showToast({ title: '加载失败', icon: 'none' })
+      Taro.showToast({ title: '加载失败，请重试', icon: 'none' })
     } finally {
       setLoading(false)
     }
