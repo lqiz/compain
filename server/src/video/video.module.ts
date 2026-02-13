@@ -9,7 +9,7 @@ import { VideoService } from './video.service'
     MulterModule.register({
       storage: memoryStorage(), // 使用内存存储
       limits: {
-        fileSize: 50 * 1024 * 1024, // 50MB
+        fileSize: 10 * 1024 * 1024, // 10MB
       }
     })
   ],
