@@ -338,18 +338,21 @@ const PublishPage = () => {
   }
 
   return (
-    <View className="h-screen bg-orange-50 flex flex-col overflow-hidden">
+    <View className="h-screen bg-gradient-to-br from-sky-50 via-yellow-50 to-pink-50 flex flex-col overflow-hidden">
+      {/* 顶部彩虹装饰条 */}
+      <View className="h-2 bg-gradient-to-r from-sky-400 via-yellow-400 via-pink-400 via-purple-400 to-green-400 flex-shrink-0" />
+
       {/* 内容区域 */}
       <View className="flex-1 flex flex-col overflow-hidden">
         {/* 顶部操作栏 */}
         <View className="flex items-center px-4 py-3 flex-shrink-0">
           {/* 返回按钮 */}
           <View
-            className="bg-white border-2 border-orange-500 rounded-full px-5 py-2 shadow-md"
+            className="bg-white border-2 border-sky-400 rounded-full px-5 py-2 shadow-md"
             style={{ minWidth: '80px' }}
             onClick={handleBack}
           >
-            <Text className="block text-orange-500 text-sm font-bold">← 返回</Text>
+            <Text className="block text-sky-500 text-sm font-bold">← 返回</Text>
           </View>
 
           {/* 页面标题 */}
@@ -365,7 +368,7 @@ const PublishPage = () => {
           <View className="flex-1 flex flex-col min-h-0 mb-3">
             {!videoPath ? (
               <View
-                className="flex-1 flex items-center justify-center border-2 border-dashed border-orange-200 rounded-2xl bg-white min-h-0"
+                className="flex-1 flex items-center justify-center border-2 border-dashed border-sky-300 rounded-2xl bg-gradient-to-br from-sky-50 to-white min-h-0"
                 onClick={chooseVideo}
               >
                 <View className="flex flex-col items-center">
@@ -400,11 +403,11 @@ const PublishPage = () => {
                   }}
                 >
                   <View
-                    className="bg-white border-2 border-orange-300 rounded-2xl px-5 py-3 shadow-md active:scale-95 transition-transform"
+                    className="bg-white border-2 border-pink-300 rounded-2xl px-5 py-3 shadow-md active:scale-95 transition-transform"
                     style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '140px' }}
                   >
                     <Text className="text-lg mr-2">🔄</Text>
-                    <Text className="text-orange-500 font-bold text-sm">重新选择</Text>
+                    <Text className="text-pink-500 font-bold text-sm">重新选择</Text>
                   </View>
                 </View>
               </View>
@@ -414,7 +417,7 @@ const PublishPage = () => {
           {/* 心里话输入区域 - 占据约25%高度 */}
           <View className="h-[25%] flex flex-col mb-3 flex-shrink-0">
             <Text className="block text-gray-800 font-semibold text-sm mb-2 flex-shrink-0">你的心里话</Text>
-            <View className="bg-white border-2 border-orange-200 rounded-2xl px-3 py-2 flex-1 flex flex-col min-h-0">
+            <View className="bg-white border-2 border-sky-200 rounded-2xl px-3 py-2 flex-1 flex flex-col min-h-0">
               <Textarea
                 className="w-full bg-transparent text-gray-800 placeholder-gray-400 text-sm flex-1 min-h-0"
                 placeholder="分享你的心里话，想说什么就说什么..."
@@ -433,21 +436,21 @@ const PublishPage = () => {
           {/* 发布按钮 */}
           <View className="flex-shrink-0">
             {uploading ? (
-              <View className="bg-white border-2 border-orange-200 rounded-2xl p-3">
+              <View className="bg-white border-2 border-pink-200 rounded-2xl p-3">
                 <View className="flex justify-between items-center mb-2">
                   <Text className="block text-gray-800 text-xs">发布中...</Text>
-                  <Text className="block text-orange-500 text-xs">{uploadProgress}%</Text>
+                  <Text className="block text-pink-500 text-xs">{uploadProgress}%</Text>
                 </View>
-                <View className="w-full h-2 bg-orange-100 rounded-full overflow-hidden">
+                <View className="w-full h-2 bg-pink-100 rounded-full overflow-hidden">
                   <View
-                    className="h-full bg-orange-500 transition-all"
+                    className="h-full bg-gradient-to-r from-sky-400 via-pink-400 to-purple-400 transition-all"
                     style={{ width: `${uploadProgress}%` }}
                   />
                 </View>
               </View>
             ) : (
               <View
-                className="bg-orange-500 rounded-2xl px-6 py-3 shadow-sm"
+                className="bg-gradient-to-r from-sky-400 via-pink-400 to-purple-400 rounded-2xl px-6 py-3 shadow-md border-2 border-white"
                 onClick={uploadVideo}
               >
                 <Text className="block text-white font-semibold text-center text-sm">

@@ -60,7 +60,10 @@ const ActivityPage = () => {
   }
 
   return (
-    <View className="min-h-screen bg-orange-50 p-5 pb-20">
+    <View className="min-h-screen bg-gradient-to-br from-sky-50 via-yellow-50 to-pink-50 p-5 pb-20">
+      {/* 顶部彩虹装饰条 */}
+      <View className="h-2 bg-gradient-to-r from-sky-400 via-yellow-400 via-pink-400 via-purple-400 to-green-400 -mx-5 mb-6" />
+
       {/* 页面标题 */}
       <View className="mb-6">
         <Text className="block text-2xl font-bold text-gray-800">活动中心</Text>
@@ -68,7 +71,7 @@ const ActivityPage = () => {
       </View>
 
       {/* 签到卡片 */}
-      <View className="bg-gradient-to-r from-orange-400 to-orange-500 rounded-2xl p-6 shadow-lg mb-6">
+      <View className="bg-gradient-to-br from-sky-400 via-pink-400 to-purple-400 rounded-2xl p-6 shadow-lg mb-6 border-2 border-white">
         <View className="flex items-center justify-between">
           <View>
             <Text className="block text-white font-bold text-xl mb-1">每日签到</Text>
@@ -84,7 +87,7 @@ const ActivityPage = () => {
             <Button
               onClick={handleCheckin}
               disabled={isCheckingIn}
-              className="bg-white text-orange-500 font-semibold rounded-full px-5 py-2 text-sm"
+              className="bg-white text-sky-600 font-semibold rounded-full px-5 py-2 text-sm border-2 border-white"
             >
               {isCheckingIn ? '签到中...' : '立即签到'}
             </Button>
@@ -100,18 +103,18 @@ const ActivityPage = () => {
       </View>
 
       {/* 积分统计 */}
-      <View className="bg-white rounded-2xl p-5 shadow-sm mb-6">
+      <View className="bg-white border-2 border-sky-200 rounded-2xl p-5 shadow-sm mb-6">
         <Text className="block text-gray-800 font-semibold text-base mb-4">
           💎 我的积分
         </Text>
         <View className="flex items-center justify-center py-4">
-          <Text className="block text-4xl font-bold text-orange-500">{points}</Text>
+          <Text className="block text-4xl font-bold text-sky-500">{points}</Text>
           <Text className="block text-gray-500 text-sm ml-2">积分</Text>
         </View>
       </View>
 
       {/* 积分规则说明 */}
-      <View className="bg-white rounded-2xl p-5 shadow-sm">
+      <View className="bg-white border-2 border-pink-200 rounded-2xl p-5 shadow-sm">
         <Text className="block text-gray-800 font-semibold text-base mb-4">
           📊 积分规则
         </Text>
@@ -122,7 +125,7 @@ const ActivityPage = () => {
               <Text className="block text-xl mr-3">📹</Text>
               <Text className="block text-gray-700 text-sm">发布视频</Text>
             </View>
-            <Text className="block text-orange-500 font-bold text-sm">+5</Text>
+            <Text className="block text-sky-500 font-bold text-sm">+5</Text>
           </View>
 
           <View className="flex justify-between items-center py-2 border-b border-gray-100">
@@ -130,7 +133,7 @@ const ActivityPage = () => {
               <Text className="block text-xl mr-3">🎬</Text>
               <Text className="block text-gray-700 text-sm">视频被合成</Text>
             </View>
-            <Text className="block text-orange-500 font-bold text-sm">+20</Text>
+            <Text className="block text-pink-500 font-bold text-sm">+20</Text>
           </View>
 
           <View className="flex justify-between items-center py-2 border-b border-gray-100">
@@ -138,7 +141,7 @@ const ActivityPage = () => {
               <Text className="block text-xl mr-3">✅</Text>
               <Text className="block text-gray-700 text-sm">每日签到</Text>
             </View>
-            <Text className="block text-orange-500 font-bold text-sm">+5</Text>
+            <Text className="block text-purple-500 font-bold text-sm">+5</Text>
           </View>
 
           <View className="flex justify-between items-center py-2">
@@ -146,7 +149,7 @@ const ActivityPage = () => {
               <Text className="block text-xl mr-3">❤️</Text>
               <Text className="block text-gray-700 text-sm">收到点赞</Text>
             </View>
-            <Text className="block text-orange-500 font-bold text-sm">+2</Text>
+            <Text className="block text-green-500 font-bold text-sm">+2</Text>
           </View>
         </View>
       </View>

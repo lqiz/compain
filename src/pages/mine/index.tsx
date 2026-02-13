@@ -192,12 +192,15 @@ const MinePage = () => {
   }
 
   return (
-    <View className="min-h-screen bg-orange-50 p-5 pb-20">
+    <View className="min-h-screen bg-gradient-to-br from-sky-50 via-yellow-50 to-pink-50 p-5 pb-20">
+      {/* 顶部彩虹装饰条 */}
+      <View className="h-2 bg-gradient-to-r from-sky-400 via-yellow-400 via-pink-400 via-purple-400 to-green-400 -mx-5 mb-6" />
+
       {/* 用户信息头部 */}
       <View className="flex items-center justify-between mb-6">
         <View className="flex items-center">
-          <View className="w-16 h-16 bg-orange-200 rounded-full mr-4 flex items-center justify-center">
-            <Text className="block text-orange-500 font-bold text-2xl">{userAge}</Text>
+          <View className="w-16 h-16 bg-gradient-to-br from-sky-200 to-pink-200 rounded-full mr-4 flex items-center justify-center border-2 border-white shadow-md">
+            <Text className="block text-sky-600 font-bold text-2xl">{userAge}</Text>
           </View>
           <View>
             <Text className="block text-gray-800 font-bold text-xl mb-1">{userNickname}</Text>
@@ -206,15 +209,15 @@ const MinePage = () => {
         </View>
 
         <View
-          className="bg-white border border-orange-200 rounded-full px-4 py-2"
+          className="bg-white border-2 border-sky-200 rounded-full px-4 py-2"
           onClick={handleLogout}
         >
-          <Text className="block text-orange-500 text-sm">退出</Text>
+          <Text className="block text-sky-500 text-sm">退出</Text>
         </View>
       </View>
 
       {/* 每日签到卡片 */}
-      <View className="bg-gradient-to-br from-orange-400 to-yellow-400 rounded-2xl p-5 mb-6 shadow-lg border-2 border-orange-300">
+      <View className="bg-gradient-to-br from-sky-400 via-pink-400 to-purple-400 rounded-2xl p-5 mb-6 shadow-lg border-2 border-white">
         <View className="flex items-center justify-between mb-4">
           <View>
             <Text className="block text-white font-bold text-lg">每日签到</Text>
@@ -256,7 +259,7 @@ const MinePage = () => {
 
       {/* 等级信息卡片 */}
       {levelInfo && (
-        <View className="bg-white border-2 border-orange-200 rounded-2xl p-5 mb-6 shadow-sm">
+        <View className="bg-white border-2 border-sky-200 rounded-2xl p-5 mb-6 shadow-sm">
           <View className="flex justify-between items-center mb-3">
             <Text className="block text-gray-800 font-semibold text-base">我的等级</Text>
             <View className={`${getLevelBadgeClass(levelInfo.level)} rounded-full px-3 py-1`}>
@@ -268,7 +271,7 @@ const MinePage = () => {
 
           {/* 卡通形象展示 */}
           <View className="flex items-center justify-center mb-4">
-            <View className="bg-gradient-to-br from-orange-100 to-yellow-100 rounded-2xl p-6 text-center">
+            <View className="bg-gradient-to-br from-sky-100 to-pink-100 rounded-2xl p-6 text-center border-2 border-white">
               <Text className="block text-6xl mb-2">{levelInfo.character.emoji}</Text>
               <Text className="block text-gray-800 font-bold text-lg mb-1">
                 {levelInfo.character.name}
@@ -282,7 +285,7 @@ const MinePage = () => {
           <View className="flex justify-between items-center mb-3">
             <View>
               <Text className="block text-gray-500 text-xs">当前积分</Text>
-              <Text className="block text-orange-500 font-bold text-2xl">{userPoints}</Text>
+              <Text className="block text-sky-500 font-bold text-2xl">{userPoints}</Text>
             </View>
             {levelInfo.pointsToNextLevel > 0 && (
               <View className="text-right">
@@ -293,9 +296,9 @@ const MinePage = () => {
           </View>
 
           {levelInfo.pointsToNextLevel > 0 && (
-            <View className="w-full h-3 bg-orange-100 rounded-full overflow-hidden">
+            <View className="w-full h-3 bg-sky-100 rounded-full overflow-hidden">
               <View
-                className="h-full bg-orange-500 transition-all"
+                className="h-full bg-gradient-to-r from-sky-400 via-pink-400 to-purple-400 transition-all"
                 style={{ width: `${levelInfo.progressPercent}%` }}
               />
             </View>
@@ -325,9 +328,9 @@ const MinePage = () => {
                 key={char.level}
                 className={`rounded-2xl p-4 text-center ${
                   isCurrent
-                    ? 'bg-gradient-to-br from-orange-400 to-yellow-400 border-2 border-orange-500'
+                    ? 'bg-gradient-to-br from-sky-400 via-pink-400 to-purple-400 border-2 border-white'
                     : isUnlocked
-                    ? 'bg-white border-2 border-orange-200'
+                    ? 'bg-white border-2 border-sky-200'
                     : 'bg-gray-100 border-2 border-gray-200'
                 }`}
               >
@@ -342,7 +345,7 @@ const MinePage = () => {
                 </Text>
                 {isCurrent && (
                   <View className="mt-2 bg-white rounded-full px-2 py-1">
-                    <Text className="block text-orange-600 text-xs font-semibold">当前</Text>
+                    <Text className="block text-pink-600 text-xs font-semibold">当前</Text>
                   </View>
                 )}
               </View>
@@ -355,8 +358,8 @@ const MinePage = () => {
       <View className="mb-6">
         <View className="flex items-center justify-between mb-4">
           <Text className="block text-gray-800 font-bold text-xl">我发布的视频</Text>
-          <View className="bg-orange-100 rounded-full px-3 py-1">
-            <Text className="block text-orange-600 text-xs">{myVideos.length} 个</Text>
+          <View className="bg-sky-100 rounded-full px-3 py-1">
+            <Text className="block text-sky-600 text-xs">{myVideos.length} 个</Text>
           </View>
         </View>
 
@@ -370,7 +373,7 @@ const MinePage = () => {
               去首页发布你的第一个心里话吧！
             </Text>
             <View
-              className="bg-gradient-to-r from-sky-400 to-sky-500 rounded-2xl py-3 px-6"
+              className="bg-gradient-to-r from-sky-400 via-pink-400 to-purple-400 rounded-2xl py-3 px-6 border-2 border-white"
               onClick={() => Taro.switchTab({ url: '/pages/index/index' })}
             >
               <Text className="block text-white font-bold text-base">去发布</Text>

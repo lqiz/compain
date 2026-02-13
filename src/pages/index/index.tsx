@@ -117,7 +117,7 @@ export default function IndexPage() {
       }}
     >
       <View
-        className="w-14 h-14 bg-gradient-to-br from-sky-400 to-sky-500 rounded-full flex items-center justify-center shadow-lg"
+        className="w-14 h-14 bg-gradient-to-br from-orange-300 via-pink-300 to-purple-300 rounded-full flex items-center justify-center shadow-lg border-2 border-white"
         onClick={handlePublish}
       >
         <Text className="text-white text-2xl font-bold">+</Text>
@@ -129,40 +129,48 @@ export default function IndexPage() {
   if (videoList.length === 0) {
     return (
       <View className="min-h-screen bg-gradient-to-b from-sky-50 via-yellow-50 to-pink-50 relative">
+        {/* 顶部彩虹装饰条 */}
+        <View className="h-2 bg-gradient-to-r from-sky-400 via-yellow-400 via-pink-400 via-purple-400 to-green-400" />
+
         {/* 空状态卡片 */}
-        <View className="flex flex-col items-center justify-center min-h-screen px-8 pb-32">
-          <View className="bg-white rounded-3xl shadow-lg p-8 text-center max-w-sm">
+        <View className="flex flex-col items-center justify-center min-h-screen px-8 pb-32 relative">
+          <View className="bg-white rounded-3xl shadow-lg p-8 text-center max-w-sm border-2 border-sky-100 relative overflow-hidden">
+            {/* 背景彩虹装饰 */}
+            <View className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-sky-200 to-pink-200 rounded-full opacity-30 -mr-8 -mt-8" />
+            <View className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-br from-yellow-200 to-orange-200 rounded-full opacity-30 -ml-6 -mb-6" />
+
             {/* 卡通图标 */}
-            <View className="mb-6">
+            <View className="mb-6 relative z-10">
               <Text className="text-6xl">🎬</Text>
             </View>
 
             {/* 主标题 */}
-            <Text className="block text-2xl font-bold text-gray-700 mb-3">
+            <Text className="block text-2xl font-bold text-gray-700 mb-3 relative z-10">
               还没有视频哦
             </Text>
 
             {/* 副标题 */}
-            <Text className="block text-gray-500 text-sm mb-6 leading-relaxed">
+            <Text className="block text-gray-500 text-sm mb-6 leading-relaxed relative z-10">
               这里是诉苦大会{'\n'}
               快去发布你的第一个视频吧！
             </Text>
 
             {/* 快速发布按钮 */}
             <View
-              className="bg-gradient-to-r from-sky-400 to-sky-500 rounded-2xl py-3 px-6"
+              className="bg-gradient-to-r from-orange-300 via-pink-300 to-purple-300 rounded-2xl py-3 px-6 shadow-md relative z-10 border-2 border-white"
               onClick={handlePublish}
             >
               <Text className="text-white font-bold text-base">立即发布</Text>
             </View>
           </View>
 
-          {/* 装饰元素 - 彩色圆点 */}
-          <View className="absolute top-20 left-8 w-8 h-8 bg-sky-300 rounded-full opacity-50" />
-          <View className="absolute top-32 right-12 w-6 h-6 bg-yellow-300 rounded-full opacity-50" />
-          <View className="absolute bottom-40 left-16 w-10 h-10 bg-pink-300 rounded-full opacity-50" />
-          <View className="absolute bottom-52 right-20 w-7 h-7 bg-green-300 rounded-full opacity-50" />
-          <View className="absolute top-60 left-24 w-5 h-5 bg-purple-300 rounded-full opacity-50" />
+          {/* 装饰元素 - 彩虹色云朵 */}
+          <View className="absolute top-20 left-8 w-12 h-8 bg-gradient-to-r from-sky-300 to-sky-400 rounded-full opacity-60 shadow-md" />
+          <View className="absolute top-32 right-12 w-10 h-7 bg-gradient-to-r from-yellow-300 to-yellow-400 rounded-full opacity-60 shadow-md" />
+          <View className="absolute bottom-40 left-16 w-14 h-9 bg-gradient-to-r from-pink-300 to-pink-400 rounded-full opacity-60 shadow-md" />
+          <View className="absolute bottom-52 right-20 w-11 h-8 bg-gradient-to-r from-green-300 to-green-400 rounded-full opacity-60 shadow-md" />
+          <View className="absolute top-60 left-24 w-9 h-6 bg-gradient-to-r from-purple-300 to-purple-400 rounded-full opacity-60 shadow-md" />
+          <View className="absolute top-72 right-32 w-10 h-7 bg-gradient-to-r from-orange-300 to-orange-400 rounded-full opacity-60 shadow-md" />
         </View>
 
         {/* 发布按钮 */}
@@ -172,14 +180,21 @@ export default function IndexPage() {
   }
 
   return (
-    <View className="min-h-screen bg-gradient-to-b from-sky-50 to-white pb-24 relative">
+    <View className="min-h-screen bg-gradient-to-b from-sky-50 via-yellow-50 to-pink-50 pb-24 relative">
+      {/* 顶部彩虹装饰条 */}
+      <View className="h-2 bg-gradient-to-r from-sky-400 via-yellow-400 via-pink-400 via-purple-400 to-green-400" />
+
       {/* 视频Feed流 */}
       <ScrollView scrollY className="h-screen">
         <View className="p-4 space-y-4">
           {videoList.map(video => (
-            <View key={video.id} className="bg-white rounded-3xl overflow-hidden shadow-sm border-2 border-sky-100">
+            <View key={video.id} className="bg-white rounded-3xl overflow-hidden shadow-sm border-2 border-sky-100 relative">
+              {/* 彩虹边框装饰 */}
+              <View className="absolute inset-0 rounded-3xl border-2 border-transparent bg-gradient-to-r from-sky-100 via-yellow-100 via-pink-100 to-purple-100 opacity-50 pointer-events-none" style={{ padding: '2px' }} />
+              <View className="absolute inset-[2px] rounded-3xl bg-white pointer-events-none" />
+
               {/* 用户信息 */}
-              <View className="p-4 border-b border-sky-50">
+              <View className="p-4 border-b border-sky-50 relative z-10">
                 <View className="flex items-center">
                   <View className="w-12 h-12 bg-gradient-to-br from-sky-200 to-sky-300 rounded-full flex items-center justify-center mr-3 shadow-sm">
                     <Text className="text-sky-600 font-bold text-lg">{video.age}</Text>
@@ -211,13 +226,13 @@ export default function IndexPage() {
               </View>
 
               {/* 点赞 */}
-              <View className="p-4 bg-white">
+              <View className="p-4 bg-white relative z-10">
                 <View
-                  className="flex items-center justify-center bg-gradient-to-r from-sky-50 to-pink-50 rounded-full py-3 px-6 shadow-sm"
+                  className="flex items-center justify-center bg-gradient-to-r from-sky-200 via-pink-200 to-orange-200 rounded-full py-3 px-6 shadow-sm"
                   onClick={() => handleLike(video.id)}
                 >
                   <Text className="mr-2 text-xl">{video.isLiked ? '❤️' : '🤍'}</Text>
-                  <Text className="text-sky-500 font-bold text-sm">
+                  <Text className="text-sky-600 font-bold text-sm">
                     {video.likeCount} 次点赞
                   </Text>
                 </View>
