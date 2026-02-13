@@ -187,7 +187,7 @@ const IndexPage = () => {
                       </View>
 
                       {/* 视频预览 */}
-                      <View className="aspect-[9/16] bg-gray-100 rounded-3xl overflow-hidden mb-3 shadow-md">
+                      <View className="aspect-video bg-gray-100 rounded-3xl overflow-hidden mb-3 shadow-md">
                         {video.videoUrl ? (
                           <Video
                             src={video.videoUrl}
