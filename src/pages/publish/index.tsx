@@ -11,11 +11,6 @@ const PublishPage = () => {
   const [uploading, setUploading] = useState<boolean>(false)
   const [uploadProgress, setUploadProgress] = useState<number>(0)
 
-  // 视频片段信息
-  const [startTime, setStartTime] = useState<number>(0)
-  const [endTime, setEndTime] = useState<number>(0)
-  const [hasEdited, setHasEdited] = useState<boolean>(false)
-
   // 页面加载时验证登录状态
   Taro.useLoad(() => {
     const nickname = getUserNickname()
@@ -32,31 +27,6 @@ const PublishPage = () => {
         })
       }, 1500)
     }
-
-    // 监听编辑器返回的片段信息
-    Taro.eventCenter.on('videoSegment', (data) => {
-      console.log('收到视频片段信息:', data)
-      // 从全局存储获取视频路径
-      const savedVideoPath = Taro.getStorageSync('editingVideoPath')
-      const savedDuration = Taro.getStorageSync('editingVideoDuration')
-
-      if (savedVideoPath) {
-        setVideoPath(savedVideoPath)
-        setVideoDuration(savedDuration)
-        setStartTime(data.startTime)
-        setEndTime(data.endTime)
-        setHasEdited(true)
-
-        // 清除临时存储
-        Taro.removeStorageSync('editingVideoPath')
-        Taro.removeStorageSync('editingVideoDuration')
-      }
-    })
-  })
-
-  // 页面卸载时移除监听
-  Taro.useUnload(() => {
-    Taro.eventCenter.off('videoSegment')
   })
 
   // 返回首页
@@ -70,7 +40,6 @@ const PublishPage = () => {
   const chooseVideo = async () => {
     try {
       // 注意：微信小程序的 maxDuration 参数最大值为 60 秒
-      // 所以我们设置为 60，然后在选择后检查实际时长
       const res = await Taro.chooseVideo({
         sourceType: ['album', 'camera'],
         maxDuration: 60, // 微信小程序限制，最大值为 60 秒
@@ -92,13 +61,13 @@ const PublishPage = () => {
         return
       }
 
-      // 保存视频信息到全局存储
-      Taro.setStorageSync('editingVideoPath', res.tempFilePath)
-      Taro.setStorageSync('editingVideoDuration', res.duration)
+      // 直接设置视频路径，不再跳转到编辑器
+      setVideoPath(res.tempFilePath)
+      setVideoDuration(res.duration)
 
-      // 跳转到视频编辑器
-      Taro.navigateTo({
-        url: `/pages/video-edit/index?videoPath=${encodeURIComponent(res.tempFilePath)}&duration=${res.duration}`
+      Taro.showToast({
+        title: '视频已选择',
+        icon: 'success'
       })
     } catch (error: any) {
       console.error('选择视频失败:', error)
@@ -113,7 +82,6 @@ const PublishPage = () => {
         } else if (error.errMsg.includes('no video')) {
           errorMessage = '未选择视频，请重新选择'
         } else if (error.errMsg.includes('maxDuration')) {
-          // 虽然 maxDuration=60，但还是提示一下
           errorMessage = '视频时长不能超过60秒，请选择更短的视频'
         }
       }
@@ -214,10 +182,7 @@ const PublishPage = () => {
         name: 'video',
         formData: {
           title: finalContent,
-          description: '',
-          startTime: startTime.toString(),
-          endTime: endTime.toString(),
-          hasEdited: hasEdited.toString()
+          description: ''
         }
       })
 
