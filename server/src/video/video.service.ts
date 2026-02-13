@@ -30,20 +30,18 @@ export class VideoService {
       bucketName: process.env.COZE_BUCKET_NAME,
       region: 'cn-beijing'
     })
-
-    // 初始化示例数据
-    this.initSampleData()
   }
 
   /**
-   * 初始化示例数据
+   * 初始化示例数据（懒加载）
    */
-  private async initSampleData() {
+  private async ensureSampleData() {
     try {
       // 检查数据库中是否已有数据
       const existingVideos = await db.select().from(videos).limit(1)
 
       if (existingVideos.length === 0) {
+        console.log('初始化示例数据...')
         // 插入示例数据
         const sampleVideos: NewVideo[] = [
           {
@@ -149,7 +147,7 @@ export class VideoService {
         videoUrl,
         videoKey: fileKey,
         likeCount: 0,
-        createdAt: Date.now()
+        createdAt: Date.now() // 使用时间戳
       }
 
       // 保存到数据库
@@ -172,6 +170,9 @@ export class VideoService {
    * @returns 视频列表
    */
   async getAllVideos(): Promise<any[]> {
+    // 确保示例数据存在
+    await this.ensureSampleData()
+
     const videoList = await db.select().from(videos).orderBy(desc(videos.createdAt))
     console.log('获取视频列表, 视频数量:', videoList.length)
     return videoList

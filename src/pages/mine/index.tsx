@@ -361,12 +361,20 @@ const MinePage = () => {
         </View>
 
         {myVideos.length === 0 ? (
-          <View className="bg-white rounded-2xl p-8 text-center shadow-sm">
-            <Text className="block text-5xl mb-3">📹</Text>
-            <Text className="block text-gray-600 text-base mb-2">还没有发布视频</Text>
-            <Text className="block text-gray-500 text-sm">
-              去&ldquo;全部&rdquo;页面发布你的第一个心里话吧
+          <View className="bg-white rounded-3xl p-8 text-center shadow-sm border-2 border-sky-100">
+            <View className="mb-4">
+              <Text className="text-6xl">📹</Text>
+            </View>
+            <Text className="block text-gray-700 font-bold text-lg mb-2">还没有发布视频</Text>
+            <Text className="block text-gray-500 text-sm mb-6 leading-relaxed">
+              去首页发布你的第一个心里话吧！
             </Text>
+            <View
+              className="bg-gradient-to-r from-sky-400 to-sky-500 rounded-2xl py-3 px-6"
+              onClick={() => Taro.switchTab({ url: '/pages/index/index' })}
+            >
+              <Text className="block text-white font-bold text-base">去发布</Text>
+            </View>
           </View>
         ) : (
           <View className="space-y-4">
@@ -411,10 +419,12 @@ const MinePage = () => {
         </View>
 
         {composedVideos.length === 0 ? (
-          <View className="bg-white rounded-2xl p-8 text-center shadow-sm">
-            <Text className="block text-5xl mb-3">🎬</Text>
-            <Text className="block text-gray-600 text-base mb-2">还没有合成视频</Text>
-            <Text className="block text-gray-500 text-sm">
+          <View className="bg-white rounded-3xl p-8 text-center shadow-sm border-2 border-purple-100">
+            <View className="mb-4">
+              <Text className="text-6xl">🎬</Text>
+            </View>
+            <Text className="block text-gray-700 font-bold text-lg mb-2">还没有合成视频</Text>
+            <Text className="block text-gray-500 text-sm leading-relaxed">
               每小时结束后系统会自动合成视频
             </Text>
           </View>
