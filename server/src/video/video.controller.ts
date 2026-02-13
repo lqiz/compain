@@ -40,7 +40,7 @@ export class VideoController {
     FileInterceptor('video', {
       storage: memoryStorage(), // 使用内存存储，避免写入本地磁盘
       limits: {
-        fileSize: 100 * 1024 * 1024, // 100MB
+        fileSize: 50 * 1024 * 1024, // 50MB
       }
     })
   )
@@ -79,8 +79,8 @@ export class VideoController {
     }
 
     // 验证文件大小
-    if (file.size > 100 * 1024 * 1024) {
-      throw new BadRequestException('视频文件大小不能超过 100MB')
+    if (file.size > 50 * 1024 * 1024) {
+      throw new BadRequestException('视频文件大小不能超过 50MB')
     }
 
     // 解析剪辑参数
