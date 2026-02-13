@@ -23,60 +23,32 @@ const IndexPage = () => {
   const [videoList, setVideoList] = useState<VideoCard[]>([])
   const [rankings, setRankings] = useState<RankingItem[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-  const [countdown, setCountdown] = useState<number>(0)
-  const [currentRound, setCurrentRound] = useState<number>(1)
 
-  // 页面加载时获取用户信息和数据
+  // 页面加载时获取数据
   Taro.useLoad(() => {
     loadData()
-
-    // 启动倒计时（每60分钟一场）
-    const timer = setInterval(() => {
-      const now = new Date()
-      const minutes = now.getHours() * 60 + now.getMinutes()
-      const countdownValue = 60 - (minutes % 60)
-      setCountdown(countdownValue)
-      setCurrentRound(Math.ceil((minutes + 1) / 60))
-    }, 1000)
-
-    // 清理定时器
-    return () => {
-      clearInterval(timer)
-    }
   })
-
-  // 格式化时间显示
-  const formatTime = (seconds: number): string => {
-    const hours = Math.floor(seconds / 3600)
-    const minutes = Math.floor((seconds % 3600) / 60)
-    const secs = seconds % 60
-
-    if (hours > 0) {
-      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
-    }
-    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
-  }
 
   // 加载数据
   const loadData = async () => {
     try {
       setLoading(true)
 
-      // 获取排名
-      const rankingsRes = await Network.request({
-        url: '/api/video/rankings',
-        method: 'GET'
-      })
+      // 并行获取排名和视频列表
+      const [rankingsRes, videosRes] = await Promise.all([
+        Network.request({
+          url: '/api/video/rankings',
+          method: 'GET'
+        }),
+        Network.request({
+          url: '/api/video/list',
+          method: 'GET'
+        })
+      ])
 
       if (rankingsRes.data.code === 200) {
         setRankings(rankingsRes.data.data)
       }
-
-      // 获取视频列表
-      const videosRes = await Network.request({
-        url: '/api/video/list',
-        method: 'GET'
-      })
 
       if (videosRes.data.code === 200) {
         const videoListData = videosRes.data.data.map((video: any) => ({
@@ -85,7 +57,7 @@ const IndexPage = () => {
           age: video.age,
           content: video.content,
           videoUrl: video.videoUrl,
-          likeCount: video.likeCount,
+          likeCount: video.likeCount || 0,
           isLiked: false
         }))
         setVideoList(videoListData)
@@ -128,206 +100,164 @@ const IndexPage = () => {
 
         loadData()
       } else {
-        throw new Error(likeRes.data.msg || '点赞失败')
+        Taro.showToast({
+          title: likeRes.data.msg || '操作失败',
+          icon: 'none'
+        })
       }
     } catch (error) {
       console.error('点赞失败:', error)
       Taro.showToast({
-        title: '点赞失败，请重试',
+        title: '点赞失败',
         icon: 'none'
       })
     }
   }
 
   // 跳转到发布页
-  const goToPublish = () => {
+  const handlePublish = () => {
     Taro.navigateTo({
       url: '/pages/publish/index'
     })
   }
 
   return (
-    <>
-      {/* 主容器 */}
-      <View className="h-screen bg-gray-50 flex flex-col overflow-hidden">
-        {loading ? (
-          <View className="flex items-center justify-center flex-1">
-            <Text className="block text-sky-400 text-lg">🌈 加载中...</Text>
-          </View>
-        ) : (
-          <>
-            {/* 视频Feed区域 - 固定约60%高度 */}
-            <View className="h-[60%] overflow-y-auto pb-4 flex-shrink-0">
-              {videoList.length === 0 ? (
-                <View className="flex items-center justify-center h-full">
-                  <Text className="block text-gray-400 text-base">暂无视频，快去发布吧！</Text>
-                </View>
-              ) : (
-                <View className="p-4 space-y-4">
-                  {videoList.map((video, index) => (
-                    <View key={video.id} className="bg-white rounded-3xl p-4 shadow-lg border-2 border-sky-100">
-                      {/* 用户信息 */}
-                      <View className="flex items-center mb-3">
-                        <View className="w-10 h-10 bg-gradient-to-br from-sky-100 to-pink-100 rounded-full mr-3 flex items-center justify-center border-2 border-sky-200">
-                          <Text className="block text-sky-500 font-bold">{video.age}</Text>
-                        </View>
-                        <View className="flex-1">
-                          <Text className="block text-gray-700 font-bold text-sm">{video.nickname}</Text>
-                          <View className="bg-sky-100 rounded-full px-2 py-0.5 w-fit mt-0.5">
-                            <Text className="block text-sky-500 text-xs font-semibold">{video.age}岁小朋友</Text>
-                          </View>
-                        </View>
+    <View className="h-screen bg-gray-50 flex flex-col">
+      {loading ? (
+        <View className="flex items-center justify-center flex-1">
+          <Text className="block text-sky-400 text-lg">🌈 加载中...</Text>
+        </View>
+      ) : (
+        <>
+          {/* 视频Feed流 - 可滚动区域 */}
+          <View className="flex-1 overflow-y-auto" style={{ paddingBottom: '220px' }}>
+            {videoList.length === 0 ? (
+              <View className="flex items-center justify-center h-full">
+                <Text className="block text-gray-400 text-base">暂无视频，快去发布吧！</Text>
+              </View>
+            ) : (
+              <View className="p-3 space-y-3">
+                {videoList.map((video, index) => (
+                  <View key={video.id} className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100">
+                    {/* 用户信息 - 紧凑设计 */}
+                    <View className="flex items-center mb-2">
+                      <View className="w-8 h-8 bg-gradient-to-br from-sky-100 to-pink-100 rounded-full mr-2 flex items-center justify-center flex-shrink-0">
+                        <Text className="block text-sky-500 font-bold text-xs">{video.age}</Text>
                       </View>
-
-                      {/* 内容 */}
-                      <View className="mb-3 bg-gradient-to-br from-sky-50 to-pink-50 rounded-2xl p-3">
-                        <Text className="block text-gray-700 text-sm leading-relaxed">
-                          {video.content}
-                        </Text>
-                      </View>
-
-                      {/* 视频预览 */}
-                      <View className="h-32 bg-gray-100 rounded-3xl overflow-hidden mb-3 shadow-md">
-                        {video.videoUrl ? (
-                          <Video
-                            src={video.videoUrl}
-                            className="w-full h-full object-cover"
-                            controls
-                            onError={(e) => {
-                              console.error(`视频${index + 1}播放错误:`, e.detail)
-                              console.error('视频URL:', video.videoUrl)
-                            }}
-                          />
-                        ) : (
-                          <View className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-sky-50 to-pink-50">
-                            <Text className="block text-4xl mb-2">🎬</Text>
-                            <Text className="block text-gray-500 text-xs">视频加载中...</Text>
-                          </View>
-                        )}
-                      </View>
-
-                      {/* 点赞按钮 */}
-                      <View
-                        className="flex items-center justify-center rounded-full py-2 px-4 shadow-md bg-gradient-to-r from-sky-100 to-blue-100 border-2 border-sky-200"
-                        onClick={() => handleLike(video.id)}
-                      >
-                        <Text className="text-xl mr-2">🤍</Text>
-                        <Text className="text-sm font-bold text-sky-500">
-                          {video.likeCount} 个喜欢
-                        </Text>
+                      <View className="flex-1 min-w-0">
+                        <Text className="block text-gray-700 font-bold text-sm truncate">{video.nickname}</Text>
+                        <Text className="block text-sky-400 text-xs">{video.age}岁</Text>
                       </View>
                     </View>
-                  ))}
-                </View>
-              )}
-            </View>
 
-            {/* 排行榜区域 - 固定约40%高度 */}
-            <View className="h-[40%] px-4 pb-4 flex-shrink-0 border-t-2 border-gray-100">
-              <View className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl p-4 shadow-lg border-2 border-purple-200 h-full flex flex-col">
-                <Text className="block text-gray-700 font-bold text-base mb-3 flex-shrink-0">
-                  🏆 小朋友排行榜
-                </Text>
+                    {/* 内容 */}
+                    <View className="mb-2 bg-sky-50 rounded-xl p-2">
+                      <Text className="block text-gray-700 text-xs leading-relaxed line-clamp-2">
+                        {video.content}
+                      </Text>
+                    </View>
 
-                <View className="space-y-2 overflow-y-auto flex-1">
+                    {/* 视频预览 - 小尺寸 */}
+                    <View className="h-24 bg-gray-100 rounded-xl overflow-hidden mb-2">
+                      {video.videoUrl ? (
+                        <Video
+                          src={video.videoUrl}
+                          className="w-full h-full object-cover"
+                          controls
+                          onError={(e) => {
+                            console.error(`视频${index + 1}播放错误:`, e.detail)
+                          }}
+                        />
+                      ) : (
+                        <View className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-sky-50 to-pink-50">
+                          <Text className="block text-2xl">🎬</Text>
+                        </View>
+                      )}
+                    </View>
+
+                    {/* 点赞按钮 */}
+                    <View
+                      className="flex items-center justify-center rounded-full py-1.5 px-3 bg-sky-50 border border-sky-200"
+                      onClick={() => handleLike(video.id)}
+                    >
+                      <Text className="text-base mr-1">{video.isLiked ? '❤️' : '🤍'}</Text>
+                      <Text className="text-xs font-bold text-sky-500">
+                        {video.likeCount}
+                      </Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+
+          {/* 排行榜 - 底部固定 */}
+          <View
+            style={{
+              position: 'fixed',
+              bottom: '56px',
+              left: 0,
+              right: 0,
+              height: '200px',
+              backgroundColor: '#ffffff',
+              borderTop: '1px solid #e5e7eb'
+            }}
+          >
+            <View className="h-full bg-gradient-to-br from-purple-50 to-pink-50 flex flex-col">
+              <View className="px-3 py-2 flex-shrink-0">
+                <Text className="block text-gray-700 font-bold text-sm">🏆 积分排行榜</Text>
+              </View>
+
+              <View className="flex-1 overflow-y-auto px-3 pb-2">
+                <View className="space-y-1.5">
                   {rankings.slice(0, 5).map(item => (
                     <View
                       key={item.rank}
-                      className="flex items-center justify-between bg-white rounded-2xl p-2 shadow-sm border border-purple-100 flex-shrink-0"
+                      className="flex items-center justify-between bg-white rounded-xl p-2 shadow-sm border border-purple-100 flex-shrink-0"
                     >
-                      <View className="flex items-center">
+                      <View className="flex items-center flex-1 min-w-0">
                         <View
-                          className={`w-8 h-8 rounded-full mr-2 flex items-center justify-center flex-shrink-0 ${
+                          className={`w-6 h-6 rounded-full mr-2 flex items-center justify-center flex-shrink-0 ${
                             item.rank === 1
-                              ? 'bg-gradient-to-br from-yellow-300 to-yellow-400 border-2 border-yellow-300'
+                              ? 'bg-gradient-to-br from-yellow-300 to-yellow-400'
                               : item.rank === 2
-                              ? 'bg-gradient-to-br from-gray-300 to-gray-400 border-2 border-gray-300'
+                              ? 'bg-gradient-to-br from-gray-300 to-gray-400'
                               : item.rank === 3
-                              ? 'bg-gradient-to-br from-orange-300 to-orange-400 border-2 border-orange-300'
-                              : 'bg-gradient-to-br from-purple-200 to-purple-300 border-2 border-purple-200'
+                              ? 'bg-gradient-to-br from-orange-300 to-orange-400'
+                              : 'bg-gradient-to-br from-purple-200 to-purple-300'
                           }`}
                         >
                           <Text className="block text-white font-bold text-xs">{item.rank}</Text>
                         </View>
-                        <Text className="block text-gray-700 text-sm font-bold truncate">{item.nickname}</Text>
+                        <Text className="block text-gray-700 text-sm font-semibold truncate">{item.nickname}</Text>
                       </View>
-                      <View className="flex items-center bg-sky-100 rounded-full px-2 py-0.5 flex-shrink-0">
-                        <Text className="block text-sky-500 font-bold text-xs">{item.points}</Text>
-                        <Text className="block text-sky-400 text-xs ml-0.5">分</Text>
-                      </View>
+                      <Text className="block text-sky-500 font-bold text-xs flex-shrink-0">{item.points}分</Text>
                     </View>
                   ))}
                 </View>
               </View>
             </View>
-          </>
-        )}
-      </View>
-
-      {/* 浮动发布按钮 - 右下角固定，在主容器外面 */}
-      <View
-        style={{
-          position: 'fixed',
-          right: '12px',
-          bottom: '70px',
-          zIndex: 100,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '8px'
-        }}
-      >
-        <View
-          className="bg-gradient-to-r from-orange-400 via-orange-500 to-pink-500 rounded-full px-5 py-3 shadow-xl border-2 border-orange-300"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            flexDirection: 'row',
-            backdropFilter: 'blur(10px)',
-            background: 'linear-gradient(135deg, #FFB74D 0%, #FF8A65 50%, #FF8A80 100%)'
-          }}
-          onClick={goToPublish}
-        >
-          <View
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              backgroundColor: 'rgba(255, 255, 255, 0.3)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginRight: '12px'
-            }}
-          >
-            <Text className="text-2xl">📹</Text>
           </View>
 
-          <View style={{ flex: 1 }}>
-            <Text className="block text-white font-bold text-lg">开始诉苦</Text>
-            <Text className="block text-white/90 text-xs mt-0.5">发布你的心里话</Text>
-          </View>
-
-          {/* 倒计时显示 */}
+          {/* 浮动发布按钮 - 右下角 */}
           <View
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.25)',
-              borderRadius: '16px',
-              padding: '6px 12px',
-              backdropFilter: 'blur(5px)'
+              position: 'fixed',
+              bottom: '260px',
+              right: '16px',
+              zIndex: 100
             }}
           >
-            <View style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <Text className="block text-white font-bold text-xl">
-                {formatTime(countdown)}
-              </Text>
-              <Text className="block text-white/80 text-xs mt-0.5">
-                第 {currentRound} 场
-              </Text>
+            <View
+              className="w-14 h-14 rounded-full bg-gradient-to-br from-sky-400 to-blue-500 shadow-lg flex items-center justify-center border-4 border-white"
+              onClick={handlePublish}
+            >
+              <Text className="text-white text-2xl font-bold">+</Text>
             </View>
           </View>
-        </View>
-      </View>
-    </>
+        </>
+      )}
+    </View>
   )
 }
 
