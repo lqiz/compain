@@ -366,7 +366,22 @@ const MinePage = () => {
               <View key={video.id} className="bg-white rounded-2xl p-4 shadow-sm">
                 <View className="aspect-[9/16] bg-gray-100 rounded-xl overflow-hidden mb-3">
                   {video.videoUrl ? (
-                    <Video src={video.videoUrl} className="w-full h-full" controls />
+                    <Video
+                      src={video.videoUrl}
+                      className="w-full h-full"
+                      controls
+                      showFullscreenBtn
+                      showPlayBtn
+                      showCenterPlayBtn
+                      enableProgressGesture
+                      onError={(e) => {
+                        console.error('视频播放错误:', e)
+                        console.error('视频URL:', video.videoUrl)
+                      }}
+                      onPlay={() => {
+                        console.log('视频开始播放:', video.id)
+                      }}
+                    />
                   ) : (
                     <View className="w-full h-full flex items-center justify-center">
                       <Text className="block text-gray-400 text-base">视频预览</Text>

@@ -1,4 +1,4 @@
-import { View, Text } from '@tarojs/components'
+import { View, Text, Video } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
 import { Network } from '@/network'
@@ -248,10 +248,29 @@ const IndexPage = () => {
 
                 {/* 视频预览 */}
                 <View className="flex-1 bg-gray-100 rounded-3xl overflow-hidden mb-3 shadow-md min-h-0">
-                  <View className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-sky-50 to-pink-50">
-                    <Text className="block text-4xl mb-2">🎬</Text>
-                    <Text className="block text-gray-500 text-xs">视频加载中...</Text>
-                  </View>
+                  {videoList[0].videoUrl ? (
+                    <Video
+                      src={videoList[0].videoUrl}
+                      className="w-full h-full"
+                      controls
+                      showFullscreenBtn
+                      showPlayBtn
+                      showCenterPlayBtn
+                      enableProgressGesture
+                      onError={(e) => {
+                        console.error('首页视频播放错误:', e)
+                        console.error('视频URL:', videoList[0].videoUrl)
+                      }}
+                      onPlay={() => {
+                        console.log('首页视频开始播放:', videoList[0].id)
+                      }}
+                    />
+                  ) : (
+                    <View className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-sky-50 to-pink-50">
+                      <Text className="block text-4xl mb-2">🎬</Text>
+                      <Text className="block text-gray-500 text-xs">视频加载中...</Text>
+                    </View>
+                  )}
                 </View>
 
                 {/* 点赞按钮 */}
