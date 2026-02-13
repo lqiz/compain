@@ -29,14 +29,27 @@ const initDb = async () => {
 
     console.log('SQL.js 加载成功')
 
-    // 数据库文件路径
-    const dataDir = path.join(__dirname, '../../data')
+    // 数据库文件路径 - 使用相对路径的绝对化
+    const projectRoot = path.join(__dirname, '../..')
+    const dataDir = path.join(projectRoot, 'data')
     const dbPath = path.join(dataDir, 'videos.db')
 
+    console.log('项目根目录:', projectRoot)
+    console.log('数据目录:', dataDir)
+    console.log('数据库路径:', dbPath)
+
     // 确保数据目录存在
-    if (!fs.existsSync(dataDir)) {
-      fs.mkdirSync(dataDir, { recursive: true })
-      console.log('创建数据库目录:', dataDir)
+    try {
+      if (!fs.existsSync(dataDir)) {
+        console.log('数据目录不存在，开始创建...')
+        fs.mkdirSync(dataDir, { recursive: true })
+        console.log('✅ 数据库目录创建成功:', dataDir)
+      } else {
+        console.log('数据目录已存在:', dataDir)
+      }
+    } catch (error) {
+      console.error('❌ 创建数据目录失败:', error)
+      throw new Error(`无法创建数据目录 ${dataDir}: ${error.message}`)
     }
 
     // 检查数据库文件是否存在
