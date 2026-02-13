@@ -1,5 +1,5 @@
 import { View, Text, Video } from '@tarojs/components'
-import Taro from '@tarojs/taro'
+import Taro, { useDidShow } from '@tarojs/taro'
 import { useState, useEffect } from 'react'
 import { Network } from '@/network'
 import { getUserNickname, getUserAge, getUserPoints, getUserLevel, logout, dailyCheckin, hasCheckedInToday, getCheckinDays } from '@/utils/auth'
@@ -61,63 +61,74 @@ const MinePage = () => {
     loadCheckinStatus()
 
     // 加载用户视频数据
-    const loadUserVideos = async () => {
-      try {
-        // 从后端API获取用户发布的视频
-        const response = await Network.request({
-          url: '/api/video/my',
-          method: 'GET',
-          data: {
-            nickname
-          }
-        })
-
-        console.log('用户视频接口响应:', response)
-
-        if (response.data.code === 200) {
-          const videos = response.data.data.map((video: any) => ({
-            id: video.id,
-            title: video.content,
-            videoUrl: video.videoUrl,
-            createdAt: new Date(video.createdAt).toLocaleDateString('zh-CN'),
-            isComposed: false
-          }))
-
-          setMyVideos(videos)
-        } else {
-          // 接口失败，使用空列表
-          console.log('用户视频接口失败，使用空列表')
-          setMyVideos([])
-        }
-
-        // 合成的视频暂时保留模拟数据
-        const mockComposedVideos: UserVideo[] = [
-          {
-            id: '2',
-            title: '第1场合成视频',
-            videoUrl: '',
-            createdAt: '2024-01-14',
-            isComposed: true,
-            composedWith: ['小明', '小红', '小刚']
-          }
-        ]
-
-        setComposedVideos(mockComposedVideos)
-      } catch (error) {
-        console.error('加载用户视频失败:', error)
-        // 出错时使用空列表
-        setMyVideos([])
-        setComposedVideos([])
-      }
-    }
-
     loadUserVideos()
   }, [])
+
+  // 每次页面显示时刷新用户视频数据（解决从发布页返回后不显示的问题）
+  useDidShow(() => {
+    loadUserVideos()
+  })
 
   // 加载签到状态
   const loadCheckinStatus = () => {
     setHasCheckedIn(hasCheckedInToday())
     setCheckinDays(getCheckinDays())
+  }
+
+  // 加载用户视频数据
+  const loadUserVideos = async () => {
+    try {
+      const nickname = getUserNickname()
+
+      console.log('正在加载用户视频, nickname:', nickname)
+
+      // 从后端API获取用户发布的视频
+      const response = await Network.request({
+        url: '/api/video/my',
+        method: 'GET',
+        data: {
+          nickname
+        }
+      })
+
+      console.log('用户视频接口响应:', response)
+
+      if (response.data.code === 200) {
+        const videos = response.data.data.map((video: any) => ({
+          id: video.id,
+          title: video.content,
+          videoUrl: video.videoUrl,
+          createdAt: new Date(video.createdAt).toLocaleDateString('zh-CN'),
+          isComposed: false
+        }))
+
+        console.log('用户视频列表:', videos)
+        setMyVideos(videos)
+      } else {
+        // 接口失败，使用空列表
+        console.log('用户视频接口失败，使用空列表')
+        setMyVideos([])
+      }
+
+      // 合成的视频暂时保留模拟数据
+      const mockComposedVideos: UserVideo[] = [
+        {
+          id: '2',
+          title: '第1场合成视频',
+          videoUrl: '',
+          createdAt: '2024-01-14',
+          isComposed: true,
+          composedWith: ['小明', '小红', '小刚']
+        }
+      ]
+
+      setComposedVideos(mockComposedVideos)
+    } catch (error) {
+      console.error('加载用户视频失败:', error)
+      // 出错时使用空列表
+      setMyVideos([])
+      setComposedVideos([])
+    }
   }
 
   // 处理签到
