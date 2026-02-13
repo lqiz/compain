@@ -222,73 +222,83 @@ const IndexPage = () => {
         </View>
       ) : (
         <>
-          {/* 视频展示区域 - 占据约65%高度 */}
-          <View className="flex-1 p-4 overflow-hidden">
-            {videoList.length > 0 && (
-              <View className="bg-white rounded-3xl p-4 shadow-lg border-2 border-sky-100 h-full flex flex-col">
-                {/* 用户信息 */}
-                <View className="flex items-center mb-3 flex-shrink-0">
-                  <View className="w-10 h-10 bg-gradient-to-br from-sky-100 to-pink-100 rounded-full mr-3 flex items-center justify-center border-2 border-sky-200">
-                    <Text className="block text-sky-500 font-bold">{videoList[0].age}</Text>
-                  </View>
-                  <View className="flex-1">
-                    <Text className="block text-gray-700 font-bold text-sm">{videoList[0].nickname}</Text>
-                    <View className="bg-sky-100 rounded-full px-2 py-0.5 w-fit mt-0.5">
-                      <Text className="block text-sky-500 text-xs font-semibold">{videoList[0].age}岁小朋友</Text>
+          {/* 视频Feed区域 - 可滚动 */}
+          <View className="flex-1 overflow-y-auto">
+            {videoList.length === 0 ? (
+              <View className="flex items-center justify-center h-full">
+                <Text className="block text-gray-400 text-base">暂无视频，快去发布吧！</Text>
+              </View>
+            ) : (
+              <View className="p-4 space-y-4">
+                {videoList.map((video, index) => (
+                  <View key={video.id} className="bg-white rounded-3xl p-4 shadow-lg border-2 border-sky-100">
+                    {/* 用户信息 */}
+                    <View className="flex items-center mb-3">
+                      <View className="w-10 h-10 bg-gradient-to-br from-sky-100 to-pink-100 rounded-full mr-3 flex items-center justify-center border-2 border-sky-200">
+                        <Text className="block text-sky-500 font-bold">{video.age}</Text>
+                      </View>
+                      <View className="flex-1">
+                        <Text className="block text-gray-700 font-bold text-sm">{video.nickname}</Text>
+                        <View className="bg-sky-100 rounded-full px-2 py-0.5 w-fit mt-0.5">
+                          <Text className="block text-sky-500 text-xs font-semibold">{video.age}岁小朋友</Text>
+                        </View>
+                      </View>
+                    </View>
+
+                    {/* 内容 */}
+                    <View className="mb-3 bg-gradient-to-br from-sky-50 to-pink-50 rounded-2xl p-3">
+                      <Text className="block text-gray-700 text-sm leading-relaxed">
+                        {video.content}
+                      </Text>
+                    </View>
+
+                    {/* 视频预览 */}
+                    <View className="aspect-[9/16] bg-gray-100 rounded-3xl overflow-hidden mb-3 shadow-md">
+                      {video.videoUrl ? (
+                        <Video
+                          src={video.videoUrl}
+                          className="w-full h-full"
+                          controls
+                          onError={(e) => {
+                            console.error(`视频${index + 1}播放错误:`, e.detail)
+                            console.error('视频URL:', video.videoUrl)
+
+                            // H5端跨域问题提示
+                            if (Taro.getEnv() === Taro.ENV_TYPE.WEAPP) {
+                              // 小程序端错误
+                              Taro.showToast({
+                                title: '视频加载失败',
+                                icon: 'none'
+                              })
+                            }
+                          }}
+                        />
+                      ) : (
+                        <View className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-sky-50 to-pink-50">
+                          <Text className="block text-4xl mb-2">🎬</Text>
+                          <Text className="block text-gray-500 text-xs">视频加载中...</Text>
+                        </View>
+                      )}
+                    </View>
+
+                    {/* 点赞按钮 */}
+                    <View
+                      className="flex items-center justify-center rounded-full py-2 px-4 shadow-md bg-gradient-to-r from-sky-100 to-blue-100 border-2 border-sky-200"
+                      onClick={() => handleLike(video.id)}
+                    >
+                      <Text className="text-xl mr-2">🤍</Text>
+                      <Text className="text-sm font-bold text-sky-500">
+                        {video.likeCount} 个喜欢
+                      </Text>
                     </View>
                   </View>
-                </View>
-
-                {/* 内容 */}
-                <View className="mb-3 bg-gradient-to-br from-sky-50 to-pink-50 rounded-2xl p-3 flex-shrink-0">
-                  <Text className="block text-gray-700 text-sm leading-relaxed">
-                    {videoList[0].content}
-                  </Text>
-                </View>
-
-                {/* 视频预览 */}
-                <View className="flex-1 bg-gray-100 rounded-3xl overflow-hidden mb-3 shadow-md min-h-0">
-                  {videoList[0].videoUrl ? (
-                    <Video
-                      src={videoList[0].videoUrl}
-                      className="w-full h-full"
-                      controls
-                      showFullscreenBtn
-                      showPlayBtn
-                      showCenterPlayBtn
-                      enableProgressGesture
-                      onError={(e) => {
-                        console.error('首页视频播放错误:', e)
-                        console.error('视频URL:', videoList[0].videoUrl)
-                      }}
-                      onPlay={() => {
-                        console.log('首页视频开始播放:', videoList[0].id)
-                      }}
-                    />
-                  ) : (
-                    <View className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-sky-50 to-pink-50">
-                      <Text className="block text-4xl mb-2">🎬</Text>
-                      <Text className="block text-gray-500 text-xs">视频加载中...</Text>
-                    </View>
-                  )}
-                </View>
-
-                {/* 点赞按钮 */}
-                <View
-                  className="flex items-center justify-center rounded-full py-2 px-4 shadow-md flex-shrink-0 bg-gradient-to-r from-sky-100 to-blue-100 border-2 border-sky-200"
-                  onClick={() => handleLike(videoList[0].id)}
-                >
-                  <Text className="text-xl mr-2">🤍</Text>
-                  <Text className="text-sm font-bold text-sky-500">
-                    {videoList[0].likeCount} 个喜欢
-                  </Text>
-                </View>
+                ))}
               </View>
             )}
           </View>
 
-          {/* 排行榜区域 - 占据约30%高度 */}
-          <View className="h-[30%] px-4 pb-4 flex-shrink-0">
+          {/* 排行榜区域 - 固定在底部，占据约30%高度 */}
+          <View className="h-[30%] px-4 pb-4 flex-shrink-0 border-t-2 border-gray-100">
             <View className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl p-4 shadow-lg border-2 border-purple-200 h-full flex flex-col">
               <Text className="block text-gray-700 font-bold text-base mb-3 flex-shrink-0">
                 🏆 小朋友排行榜

@@ -370,16 +370,9 @@ const MinePage = () => {
                       src={video.videoUrl}
                       className="w-full h-full"
                       controls
-                      showFullscreenBtn
-                      showPlayBtn
-                      showCenterPlayBtn
-                      enableProgressGesture
                       onError={(e) => {
-                        console.error('视频播放错误:', e)
+                        console.error('我的页面视频播放错误:', e.detail)
                         console.error('视频URL:', video.videoUrl)
-                      }}
-                      onPlay={() => {
-                        console.log('视频开始播放:', video.id)
                       }}
                     />
                   ) : (
