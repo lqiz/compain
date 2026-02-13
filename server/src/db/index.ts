@@ -1,10 +1,10 @@
 import { drizzle } from 'drizzle-orm/better-sqlite3'
-import Database from 'better-sqlite3'
+const Database = require('better-sqlite3')
 import * as schema from './schema'
 import { videos } from './schema'
 
 // 创建数据库连接
-let sqlite: Database.Database
+let sqlite: any
 let dbInitialized = false
 
 const getDb = () => {

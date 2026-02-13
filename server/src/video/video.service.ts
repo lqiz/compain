@@ -23,13 +23,25 @@ export class VideoService {
   ]
 
   constructor() {
+    console.log('初始化 S3Storage...')
+    console.log('COZE_BUCKET_ENDPOINT_URL:', process.env.COZE_BUCKET_ENDPOINT_URL)
+    console.log('COZE_BUCKET_NAME:', process.env.COZE_BUCKET_NAME)
+
+    // 检查环境变量是否配置
+    if (!process.env.COZE_BUCKET_ENDPOINT_URL || !process.env.COZE_BUCKET_NAME) {
+      console.warn('⚠️  对象存储环境变量未配置，将使用默认配置')
+      console.warn('请在 .env.local 中配置 COZE_BUCKET_ENDPOINT_URL 和 COZE_BUCKET_NAME')
+    }
+
     this.storage = new S3Storage({
-      endpointUrl: process.env.COZE_BUCKET_ENDPOINT_URL,
+      endpointUrl: process.env.COZE_BUCKET_ENDPOINT_URL || '',
       accessKey: '',
       secretKey: '',
-      bucketName: process.env.COZE_BUCKET_NAME,
+      bucketName: process.env.COZE_BUCKET_NAME || '',
       region: 'cn-beijing'
     })
+
+    console.log('S3Storage 初始化完成')
   }
 
   /**
@@ -103,24 +115,46 @@ export class VideoService {
     title: string
   ): Promise<{ videoUrl: string; videoId: string }> {
     try {
+      console.log('========== 开始上传视频 ==========')
+      console.log('用户信息:', { nickname, age })
+      console.log('视频标题:', title)
+      console.log('文件信息:', {
+        originalName,
+        mimetype,
+        size: fileBuffer.length
+      })
+
       // 验证文件类型（只允许视频）
       if (!mimetype.startsWith('video/')) {
+        console.error('文件类型错误:', mimetype)
         throw new BadRequestException('只支持上传视频文件')
       }
 
       // 验证文件大小（最大 100MB）
       const maxSize = 100 * 1024 * 1024
       if (fileBuffer.length > maxSize) {
+        console.error('文件大小超限:', fileBuffer.length)
         throw new BadRequestException('视频文件大小不能超过 100MB')
       }
 
       // 生成文件名：videos/原始文件名
       const fileName = `videos/${Date.now()}_${originalName}`
+      console.log('生成的文件名:', fileName)
+
+      // 检查对象存储配置
+      if (!process.env.COZE_BUCKET_ENDPOINT_URL || !process.env.COZE_BUCKET_NAME) {
+        console.error('对象存储环境变量未配置')
+        throw new BadRequestException('对象存储服务未配置，请联系管理员')
+      }
 
       // 上传到对象存储
       console.log('开始上传视频到对象存储...')
-      console.log('文件大小:', fileBuffer.length)
+      console.log('文件大小:', fileBuffer.length, 'bytes')
       console.log('文件类型:', mimetype)
+      console.log('对象存储配置:', {
+        endpointUrl: process.env.COZE_BUCKET_ENDPOINT_URL,
+        bucketName: process.env.COZE_BUCKET_NAME
+      })
 
       const fileKey = await this.storage.uploadFile({
         fileContent: fileBuffer,
@@ -128,15 +162,16 @@ export class VideoService {
         contentType: mimetype
       })
 
-      console.log('视频上传成功，文件 key:', fileKey)
+      console.log('✅ 视频上传成功，文件 key:', fileKey)
 
       // 生成签名 URL（有效期 7 天）
+      console.log('生成视频访问 URL...')
       const videoUrl = await this.storage.generatePresignedUrl({
         key: fileKey,
         expireTime: 7 * 24 * 3600 // 7 天
       })
 
-      console.log('生成视频访问 URL 成功')
+      console.log('✅ 生成视频访问 URL 成功:', videoUrl)
 
       // 创建新的视频记录
       const newVideo: NewVideo = {
@@ -150,17 +185,24 @@ export class VideoService {
         createdAt: Date.now() // 使用时间戳
       }
 
+      console.log('保存视频信息到数据库...')
       // 保存到数据库
       await db.insert(videos).values(newVideo)
 
-      console.log('视频信息已保存到数据库, videoId:', newVideo.id)
+      console.log('✅ 视频信息已保存到数据库, videoId:', newVideo.id)
+      console.log('========== 视频上传完成 ==========')
 
       return {
         videoUrl,
         videoId: newVideo.id
       }
     } catch (error) {
-      console.error('视频上传失败:', error)
+      console.error('❌ 视频上传失败:', error)
+      console.error('错误详情:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      })
       throw new BadRequestException(error.message || '视频上传失败')
     }
   }
