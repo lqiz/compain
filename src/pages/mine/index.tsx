@@ -364,13 +364,16 @@ const MinePage = () => {
           <View className="space-y-4">
             {myVideos.map((video) => (
               <View key={video.id} className="bg-white rounded-2xl p-4 shadow-sm">
-                <View className="aspect-video bg-gray-100 rounded-xl overflow-hidden mb-3">
+                <View className="aspect-video bg-gray-100 rounded-xl overflow-hidden mb-3 relative">
                   {video.videoUrl ? (
                     <Video
                       src={video.videoUrl}
                       className="w-full h-full"
-                      style={{ display: 'block' }}
+                      style={{ display: 'block', position: 'relative' }}
                       controls
+                      showCenterPlayBtn
+                      playBtnPosition="center"
+                      objectFit="contain"
                       onError={(e) => {
                         console.error('我的页面视频播放错误:', e.detail)
                         console.error('视频URL:', video.videoUrl)
@@ -426,13 +429,16 @@ const MinePage = () => {
                   </View>
                 </View>
 
-                <View className="aspect-video bg-gray-100 rounded-xl overflow-hidden mb-3">
+                <View className="aspect-video bg-gray-100 rounded-xl overflow-hidden mb-3 relative">
                   {video.videoUrl ? (
                     <Video
                       src={video.videoUrl}
                       className="w-full h-full"
-                      style={{ display: 'block' }}
+                      style={{ display: 'block', position: 'relative' }}
                       controls
+                      showCenterPlayBtn
+                      playBtnPosition="center"
+                      objectFit="contain"
                     />
                   ) : (
                     <View className="w-full h-full flex items-center justify-center">
