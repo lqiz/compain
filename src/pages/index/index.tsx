@@ -187,11 +187,11 @@ const IndexPage = () => {
                       </View>
 
                       {/* 视频预览 */}
-                      <View className="aspect-video bg-gray-100 rounded-3xl overflow-hidden mb-3 shadow-md">
+                      <View className="h-32 bg-gray-100 rounded-3xl overflow-hidden mb-3 shadow-md">
                         {video.videoUrl ? (
                           <Video
                             src={video.videoUrl}
-                            className="w-full h-full"
+                            className="w-full h-full object-cover"
                             controls
                             onError={(e) => {
                               console.error(`视频${index + 1}播放错误:`, e.detail)
