@@ -128,11 +128,13 @@ export default function IndexPage() {
               </View>
 
               {/* 视频预览 */}
-              <View className="aspect-video bg-black">
+              <View className="aspect-video bg-black relative overflow-hidden">
                 <Video
                   src={video.videoUrl}
                   className="w-full h-full"
+                  style={{ display: 'block' }}
                   controls
+                  objectFit="contain"
                 />
               </View>
 
