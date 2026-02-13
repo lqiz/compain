@@ -156,8 +156,8 @@ const IndexPage = () => {
           </View>
         ) : (
           <>
-            {/* 视频Feed区域 - 可滚动 */}
-            <View className="flex-1 overflow-y-auto pb-4">
+            {/* 视频Feed区域 - 固定约60%高度 */}
+            <View className="h-[60%] overflow-y-auto pb-4 flex-shrink-0">
               {videoList.length === 0 ? (
                 <View className="flex items-center justify-center h-full">
                   <Text className="block text-gray-400 text-base">暂无视频，快去发布吧！</Text>
@@ -222,8 +222,8 @@ const IndexPage = () => {
               )}
             </View>
 
-            {/* 排行榜区域 - 固定在底部 */}
-            <View className="h-[30%] px-4 pb-4 flex-shrink-0 border-t-2 border-gray-100">
+            {/* 排行榜区域 - 固定约40%高度 */}
+            <View className="h-[40%] px-4 pb-4 flex-shrink-0 border-t-2 border-gray-100">
               <View className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl p-4 shadow-lg border-2 border-purple-200 h-full flex flex-col">
                 <Text className="block text-gray-700 font-bold text-base mb-3 flex-shrink-0">
                   🏆 小朋友排行榜
