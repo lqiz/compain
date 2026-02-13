@@ -1,16 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common'
 import { S3Storage } from 'coze-coding-dev-sdk'
-
-// 视频信息接口
-interface Video {
-  id: string
-  nickname: string
-  age: number
-  content: string
-  videoUrl: string
-  likeCount: number
-  createdAt: Date
-}
+import { eq, desc } from 'drizzle-orm'
+import db, { videos, NewVideo } from '../db'
 
 // 用户信息接口
 interface User {
@@ -22,38 +13,7 @@ interface User {
 export class VideoService {
   private storage: S3Storage
 
-  // 内存存储：视频列表
-  private videos: Video[] = [
-    {
-      id: '1',
-      nickname: '小明同学',
-      age: 10,
-      content: '今天作业太多了，写了好久都没写完，感觉好累😢',
-      videoUrl: 'https://media.w3.org/2010/05/sintel/trailer.mp4',
-      likeCount: 128,
-      createdAt: new Date()
-    },
-    {
-      id: '2',
-      nickname: '小红妹妹',
-      age: 9,
-      content: '妈妈今天给我买了新的画画本，好开心！🎨',
-      videoUrl: 'https://media.w3.org/2010/05/bunny/trailer.mp4',
-      likeCount: 256,
-      createdAt: new Date()
-    },
-    {
-      id: '3',
-      nickname: '小刚哥哥',
-      age: 11,
-      content: '今天在操场上踢足球，我们队赢了！⚽️',
-      videoUrl: 'https://test-videos.co.uk/videos/matrix/matrix_480p.mov',
-      likeCount: 89,
-      createdAt: new Date()
-    }
-  ]
-
-  // 内存存储：用户列表
+  // 内存存储：用户列表（暂时保留，后续也可以改为数据库）
   private users: User[] = [
     { nickname: '小红妹妹', points: 350 },
     { nickname: '小明同学', points: 280 },
@@ -70,6 +30,60 @@ export class VideoService {
       bucketName: process.env.COZE_BUCKET_NAME,
       region: 'cn-beijing'
     })
+
+    // 初始化示例数据
+    this.initSampleData()
+  }
+
+  /**
+   * 初始化示例数据
+   */
+  private async initSampleData() {
+    try {
+      // 检查数据库中是否已有数据
+      const existingVideos = await db.select().from(videos).limit(1)
+
+      if (existingVideos.length === 0) {
+        // 插入示例数据
+        const sampleVideos: NewVideo[] = [
+          {
+            id: '1',
+            nickname: '小明同学',
+            age: 10,
+            content: '今天作业太多了，写了好久都没写完，感觉好累😢',
+            videoUrl: 'https://media.w3.org/2010/05/sintel/trailer.mp4',
+            videoKey: 'sample/sintel.mp4',
+            likeCount: 128,
+            createdAt: Date.now()
+          },
+          {
+            id: '2',
+            nickname: '小红妹妹',
+            age: 9,
+            content: '妈妈今天给我买了新的画画本，好开心！🎨',
+            videoUrl: 'https://media.w3.org/2010/05/bunny/trailer.mp4',
+            videoKey: 'sample/bunny.mp4',
+            likeCount: 256,
+            createdAt: Date.now()
+          },
+          {
+            id: '3',
+            nickname: '小刚哥哥',
+            age: 11,
+            content: '今天在操场上踢足球，我们队赢了！⚽️',
+            videoUrl: 'https://test-videos.co.uk/videos/matrix/matrix_480p.mov',
+            videoKey: 'sample/matrix.mov',
+            likeCount: 89,
+            createdAt: Date.now()
+          }
+        ]
+
+        await db.insert(videos).values(sampleVideos)
+        console.log('示例数据初始化完成')
+      }
+    } catch (error) {
+      console.error('初始化示例数据失败:', error)
+    }
   }
 
   /**
@@ -97,7 +111,7 @@ export class VideoService {
       }
 
       // 验证文件大小（最大 100MB）
-      const maxSize = 100 * 1024 * 1024 // 100MB
+      const maxSize = 100 * 1024 * 1024
       if (fileBuffer.length > maxSize) {
         throw new BadRequestException('视频文件大小不能超过 100MB')
       }
@@ -127,18 +141,19 @@ export class VideoService {
       console.log('生成视频访问 URL 成功')
 
       // 创建新的视频记录
-      const newVideo: Video = {
+      const newVideo: NewVideo = {
         id: Date.now().toString(),
         nickname,
         age,
         content: title,
         videoUrl,
+        videoKey: fileKey,
         likeCount: 0,
-        createdAt: new Date()
+        createdAt: Date.now()
       }
 
-      // 保存到内存存储
-      this.videos.unshift(newVideo) // 添加到数组开头
+      // 保存到数据库
+      await db.insert(videos).values(newVideo)
 
       console.log('视频信息已保存到数据库, videoId:', newVideo.id)
 
@@ -153,12 +168,13 @@ export class VideoService {
   }
 
   /**
-   * 获取所有视频列表
+   * 获取所有视频列表（按创建时间倒序）
    * @returns 视频列表
    */
-  async getAllVideos(): Promise<Video[]> {
-    console.log('获取视频列表, 视频数量:', this.videos.length)
-    return this.videos
+  async getAllVideos(): Promise<any[]> {
+    const videoList = await db.select().from(videos).orderBy(desc(videos.createdAt))
+    console.log('获取视频列表, 视频数量:', videoList.length)
+    return videoList
   }
 
   /**
@@ -166,9 +182,13 @@ export class VideoService {
    * @param nickname 用户昵称
    * @returns 该用户的视频列表
    */
-  async getUserVideos(nickname: string): Promise<Video[]> {
+  async getUserVideos(nickname: string): Promise<any[]> {
     console.log('获取用户视频, nickname:', nickname)
-    const userVideos = this.videos.filter(v => v.nickname === nickname)
+    const userVideos = await db
+      .select()
+      .from(videos)
+      .where(eq(videos.nickname, nickname))
+      .orderBy(desc(videos.createdAt))
     console.log('用户视频数量:', userVideos.length)
     return userVideos
   }
@@ -179,56 +199,74 @@ export class VideoService {
    * @returns 点赞结果（新的点赞数）
    */
   async likeVideo(videoId: string): Promise<{ likeCount: number; isLiked: boolean }> {
-    console.log('处理点赞, videoId:', videoId)
+    console.log('点赞视频, videoId:', videoId)
 
     // 查找视频
-    const video = this.videos.find(v => v.id === videoId)
+    const videoList = await db.select().from(videos).where(eq(videos.id, videoId))
 
-    if (!video) {
+    if (videoList.length === 0) {
       throw new BadRequestException('视频不存在')
     }
 
+    const video = videoList[0]
+
     // 增加点赞数
-    video.likeCount += 1
+    const newLikeCount = (video.likeCount || 0) + 1
 
-    console.log(`视频 ${videoId} 点赞数增加到: ${video.likeCount}`)
+    // 更新数据库
+    await db
+      .update(videos)
+      .set({ likeCount: newLikeCount })
+      .where(eq(videos.id, videoId))
 
-    // 被点赞的用户获得2积分
-    const user = this.users.find(u => u.nickname === video.nickname)
-    if (user) {
-      user.points += 2
-      console.log(`用户 ${user.nickname} 获得点赞奖励，当前积分: ${user.points}`)
-    }
+    console.log('点赞成功, 新的点赞数:', newLikeCount)
 
     return {
-      likeCount: video.likeCount,
+      likeCount: newLikeCount,
       isLiked: true
     }
   }
 
   /**
-   * 获取用户排名
+   * 获取用户排名列表（按积分排序）
    * @returns 用户排名列表
    */
-  async getRankings(): Promise<{ rank: number; nickname: string; points: number }[]> {
+  async getRankings(): Promise<Array<{ rank: number; nickname: string; points: number }>> {
     console.log('获取用户排名')
 
-    // 按积分从高到低排序
-    const sortedUsers = this.users
-      .map((user, index) => ({
-        rank: index + 1,
-        nickname: user.nickname,
-        points: user.points
-      }))
-      .sort((a, b) => b.points - a.points)
+    // 按积分排序
+    const sortedUsers = [...this.users].sort((a, b) => b.points - a.points)
 
-    // 重新计算排名（积分相同时按出现顺序）
-    sortedUsers.forEach((user, index) => {
-      user.rank = index + 1
-    })
+    // 添加排名
+    const rankings = sortedUsers.map((user, index) => ({
+      rank: index + 1,
+      nickname: user.nickname,
+      points: user.points
+    }))
 
-    console.log('用户排名:', sortedUsers)
+    return rankings
+  }
 
-    return sortedUsers.slice(0, 10) // 返回前10名
+  /**
+   * 给用户增加积分
+   * @param nickname 用户昵称
+   * @param points 增加的积分
+   */
+  addUserPoints(nickname: string, points: number): void {
+    const user = this.users.find(u => u.nickname === nickname)
+    if (user) {
+      user.points += points
+      console.log(`用户 ${nickname} 积分增加 ${points}, 当前积分: ${user.points}`)
+    }
+  }
+
+  /**
+   * 获取用户积分
+   * @param nickname 用户昵称
+   * @returns 用户积分
+   */
+  getUserPoints(nickname: string): number {
+    const user = this.users.find(u => u.nickname === nickname)
+    return user?.points || 0
   }
 }
