@@ -50,9 +50,9 @@ export class VideoController {
   @UseInterceptors(
     FileInterceptor('video', {
       storage: memoryStorage(), // 使用内存存储，避免写入本地磁盘
-      limits: {
-        fileSize: 100 * 1024 * 1024, // 100MB - 与Service层保持一致
-      }
+      // limits: {
+      //   fileSize: 100 * 1024 * 1024, // 100MB - 与Service层保持一致（暂时禁用）
+      // }
     })
   )
   async uploadVideo(
@@ -89,13 +89,15 @@ export class VideoController {
       throw new BadRequestException('请选择要上传的视频文件')
     }
 
-    // 验证文件大小（100MB）
-    const maxSize = 100 * 1024 * 1024
-    if (file.size > maxSize) {
-      const sizeMB = (file.size / 1024 / 1024).toFixed(2)
-      console.error(`❌ 文件大小超限: ${sizeMB}MB`)
-      throw new BadRequestException(`视频文件大小不能超过 100MB，当前文件大小为 ${sizeMB}MB`)
-    }
+    // 验证文件大小（100MB）- 暂时禁用以排查问题
+    // const maxSize = 100 * 1024 * 1024
+    // if (file.size > maxSize) {
+    //   const sizeMB = (file.size / 1024 / 1024).toFixed(2)
+    //   console.error(`❌ 文件大小超限: ${sizeMB}MB`)
+    //   throw new BadRequestException(`视频文件大小不能超过 100MB，当前文件大小为 ${sizeMB}MB`)
+    // }
+
+    console.log('文件大小检查通过（暂时禁用）:', file?.size ? (file.size / 1024 / 1024).toFixed(2) + 'MB' : 'N/A')
 
     // 验证文件类型（基于文件扩展名，兼容真机上传）
     const fileName = file.originalname.toLowerCase()

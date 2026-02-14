@@ -88,20 +88,20 @@ const PublishPage = () => {
         }
       }
 
-      // 检查文件大小限制（100MB）
-      const MAX_FILE_SIZE = 100 * 1024 * 1024
-      if (fileSize > MAX_FILE_SIZE) {
-        const sizeInMB = Math.round(fileSize / 1024 / 1024)
-        Taro.showModal({
-          title: '视频文件过大',
-          content: `您选择的视频大小为 ${sizeInMB}MB，超过了 100MB 的限制。\n\n建议：\n• 选择时长更短的视频（建议 30 秒以内）\n• 使用手机自带的视频编辑功能压缩后再上传`,
-          showCancel: false,
-          confirmText: '我知道了'
-        })
-        return
-      }
+      // 检查文件大小限制（100MB）- 暂时禁用以排查问题
+      // const MAX_FILE_SIZE = 100 * 1024 * 1024
+      // if (fileSize > MAX_FILE_SIZE) {
+      //   const sizeInMB = Math.round(fileSize / 1024 / 1024)
+      //   Taro.showModal({
+      //     title: '视频文件过大',
+      //     content: `您选择的视频大小为 ${sizeInMB}MB，超过了 100MB 的限制。\n\n建议：\n• 选择时长更短的视频（建议 30 秒以内）\n• 使用手机自带的视频编辑功能压缩后再上传`,
+      //     showCancel: false,
+      //     confirmText: '我知道了'
+      //   })
+      //   return
+      // }
 
-      console.log('文件大小检查通过:', fileSize / 1024 / 1024, 'MB')
+      console.log('文件大小检查通过（暂时禁用）:', fileSize / 1024 / 1024, 'MB')
 
       // 直接设置视频路径，不再跳转到编辑器
       setVideoPath(res.tempFilePath)
@@ -187,13 +187,13 @@ const PublishPage = () => {
         }
       }
 
-      // 检查文件大小限制（100MB）
-      const MAX_FILE_SIZE = 100 * 1024 * 1024
-      if (fileSize > MAX_FILE_SIZE) {
-        throw new Error(`视频文件过大（${Math.round(fileSize / 1024 / 1024)}MB），请选择100MB以内的视频`)
-      }
+      // 检查文件大小限制（100MB）- 暂时禁用以排查问题
+      // const MAX_FILE_SIZE = 100 * 1024 * 1024
+      // if (fileSize > MAX_FILE_SIZE) {
+      //   throw new Error(`视频文件过大（${Math.round(fileSize / 1024 / 1024)}MB），请选择100MB以内的视频`)
+      // }
 
-      console.log('文件大小检查通过:', fileSize / 1024 / 1024, 'MB')
+      console.log('文件大小检查通过（暂时禁用）:', fileSize / 1024 / 1024, 'MB')
 
       // 根据文件大小动态计算超时时间（最少60秒，每MB增加2秒）
       const fileSizeInMB = fileSize / 1024 / 1024
