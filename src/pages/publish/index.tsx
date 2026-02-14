@@ -195,21 +195,21 @@ const PublishPage = () => {
 
       console.log('文件大小检查通过（暂时禁用）:', fileSize / 1024 / 1024, 'MB')
 
-      // 根据文件大小动态计算超时时间（最少60秒，每MB增加2秒）
+      // 根据文件大小动态计算超时时间（最少300秒 = 5分钟，每MB增加5秒）
       const fileSizeInMB = fileSize / 1024 / 1024
-      const timeoutDuration = Math.max(60000, fileSizeInMB * 2000 + 30000)
+      const timeoutDuration = Math.max(300000, fileSizeInMB * 5000 + 300000) // 5分钟起步
       console.log('动态超时时间:', Math.round(timeoutDuration / 1000), '秒')
 
-      // 模拟上传进度 - 改进版本
+      // 模拟上传进度 - 改进版本，更慢一些避免超时
       progressInterval = setInterval(() => {
         setUploadProgress(prev => {
           if (prev >= 95) {
             clearInterval(progressInterval!)
             return 95
           }
-          return prev + 5
+          return prev + 2 // 改为2，更慢
         })
-      }, 200)
+      }, 500) // 改为500ms，更慢
 
       // H5 环境下使用完整 URL，小程序使用相对路径
       // 将 ENV_TYPE 转换为字符串进行比较
