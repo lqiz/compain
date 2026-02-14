@@ -88,13 +88,13 @@ const PublishPage = () => {
         }
       }
 
-      // 检查文件大小限制（10MB - 临时降低以测试）
-      const MAX_FILE_SIZE = 10 * 1024 * 1024
+      // 检查文件大小限制（100MB）
+      const MAX_FILE_SIZE = 100 * 1024 * 1024
       if (fileSize > MAX_FILE_SIZE) {
         const sizeInMB = Math.round(fileSize / 1024 / 1024)
         Taro.showModal({
           title: '视频文件过大',
-          content: `您选择的视频大小为 ${sizeInMB}MB，超过了 10MB 的测试限制。\n\n这是为了确保上传速度和稳定性。\n\n建议：\n• 选择时长更短的视频（建议 5 秒以内）\n• 使用手机自带的视频编辑功能压缩后再上传`,
+          content: `您选择的视频大小为 ${sizeInMB}MB，超过了 100MB 的限制。\n\n建议：\n• 选择时长更短的视频（建议 30 秒以内）\n• 使用手机自带的视频编辑功能压缩后再上传`,
           showCancel: false,
           confirmText: '我知道了'
         })
@@ -187,10 +187,10 @@ const PublishPage = () => {
         }
       }
 
-      // 检查文件大小限制（10MB - 临时降低以测试）
-      const MAX_FILE_SIZE = 10 * 1024 * 1024
+      // 检查文件大小限制（100MB）
+      const MAX_FILE_SIZE = 100 * 1024 * 1024
       if (fileSize > MAX_FILE_SIZE) {
-        throw new Error(`视频文件过大（${Math.round(fileSize / 1024 / 1024)}MB），请选择10MB以内的视频`)
+        throw new Error(`视频文件过大（${Math.round(fileSize / 1024 / 1024)}MB），请选择100MB以内的视频`)
       }
 
       console.log('文件大小检查通过:', fileSize / 1024 / 1024, 'MB')
