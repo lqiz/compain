@@ -51,7 +51,7 @@ export class VideoController {
     FileInterceptor('video', {
       storage: memoryStorage(), // 使用内存存储，避免写入本地磁盘
       limits: {
-        fileSize: 10 * 1024 * 1024, // 10MB
+        fileSize: 100 * 1024 * 1024, // 100MB - 与Service层保持一致
       }
     })
   )
@@ -67,19 +67,17 @@ export class VideoController {
       age?: string
     }
   ) {
-    console.log('收到视频上传请求')
+    console.log('========== 收到视频上传请求 ==========')
     console.log('文件信息:', {
       originalname: file?.originalname,
       mimetype: file?.mimetype,
-      size: file?.size
+      size: file?.size,
+      sizeMB: file?.size ? (file.size / 1024 / 1024).toFixed(2) + 'MB' : 'N/A'
     })
-    console.log('视频标题:', body?.title)
-    console.log('视频描述:', body?.description)
-    console.log('用户信息:', {
+    console.log('请求参数:', {
+      title: body?.title,
       nickname: body?.nickname,
-      age: body?.age
-    })
-    console.log('剪辑信息:', {
+      age: body?.age,
       startTime: body?.startTime,
       endTime: body?.endTime,
       hasEdited: body?.hasEdited
@@ -87,17 +85,29 @@ export class VideoController {
 
     // 验证文件是否存在
     if (!file) {
+      console.error('❌ 文件不存在')
       throw new BadRequestException('请选择要上传的视频文件')
     }
 
-    // 验证文件类型
-    if (!file.mimetype.startsWith('video/')) {
-      throw new BadRequestException('只支持上传视频文件')
+    // 验证文件大小（100MB）
+    const maxSize = 100 * 1024 * 1024
+    if (file.size > maxSize) {
+      const sizeMB = (file.size / 1024 / 1024).toFixed(2)
+      console.error(`❌ 文件大小超限: ${sizeMB}MB`)
+      throw new BadRequestException(`视频文件大小不能超过 100MB，当前文件大小为 ${sizeMB}MB`)
     }
 
-    // 验证文件大小
-    if (file.size > 10 * 1024 * 1024) {
-      throw new BadRequestException('视频文件大小不能超过 10MB')
+    // 验证文件类型（基于文件扩展名，兼容真机上传）
+    const fileName = file.originalname.toLowerCase()
+    const allowedExtensions = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.flv']
+    const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext))
+
+    if (!hasValidExtension && !file.mimetype.startsWith('video/')) {
+      console.error('❌ 文件类型不合法:', {
+        originalname: file.originalname,
+        mimetype: file.mimetype
+      })
+      throw new BadRequestException(`只支持上传视频文件（${allowedExtensions.join(', ')}），当前文件类型：${file.mimetype || '未知'}`)
     }
 
     // 解析剪辑参数

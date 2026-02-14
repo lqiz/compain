@@ -129,13 +129,21 @@ export class VideoService implements OnModuleInit {
       console.log('文件信息:', {
         originalName,
         mimetype,
-        size: fileBuffer.length
+        size: fileBuffer.length,
+        sizeMB: (fileBuffer.length / 1024 / 1024).toFixed(2) + 'MB'
       })
 
-      // 验证文件类型（只允许视频）
-      if (!mimetype.startsWith('video/')) {
-        console.error('文件类型错误:', mimetype)
-        throw new BadRequestException('只支持上传视频文件')
+      // 验证文件类型（基于文件扩展名 + mimetype，兼容真机上传）
+      const fileNameLower = originalName.toLowerCase()
+      const allowedExtensions = ['.mp4', '.mov', '.avi', '.mkv', '.webm', '.flv']
+      const hasValidExtension = allowedExtensions.some(ext => fileNameLower.endsWith(ext))
+
+      if (!hasValidExtension && !mimetype.startsWith('video/')) {
+        console.error('❌ 文件类型不合法:', {
+          originalName,
+          mimetype
+        })
+        throw new BadRequestException(`只支持上传视频文件（${allowedExtensions.join(', ')}），当前文件类型：${mimetype || '未知'}`)
       }
 
       // 验证文件大小（最大 100MB）
@@ -170,16 +178,18 @@ export class VideoService implements OnModuleInit {
         contentType: mimetype
       })
 
-      console.log('✅ 视频上传成功，文件 key:', fileKey)
+      console.log('✅ 视频上传到对象存储成功')
+      console.log('   文件 key:', fileKey)
 
       // 生成签名 URL（有效期 7 天）
-      console.log('生成视频访问 URL...')
+      console.log('开始生成视频访问 URL...')
       const videoUrl = await this.storage.generatePresignedUrl({
         key: fileKey,
         expireTime: 7 * 24 * 3600 // 7 天
       })
 
-      console.log('✅ 生成视频访问 URL 成功:', videoUrl)
+      console.log('✅ 视频访问 URL 生成成功')
+      console.log('   URL:', videoUrl.substring(0, 80) + '...')
 
       // 创建新的视频记录
       const newVideo: NewVideo = {
@@ -197,21 +207,43 @@ export class VideoService implements OnModuleInit {
       // 保存到数据库
       await this.db.insert(videos).values(newVideo)
 
-      console.log('✅ 视频信息已保存到数据库, videoId:', newVideo.id)
-      console.log('========== 视频上传完成 ==========')
+      console.log('✅ 视频信息已保存到数据库')
+      console.log('   视频ID:', newVideo.id)
+      console.log('   昵称:', nickname)
+      console.log('   内容:', title)
+      console.log('========== 视频上传流程完成 ==========')
 
       return {
         videoUrl,
         videoId: newVideo.id
       }
     } catch (error) {
-      console.error('❌ 视频上传失败:', error)
-      console.error('错误详情:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
+      console.error('❌========== 视频上传失败 ==========')
+      console.error('错误信息:', error.message)
+      console.error('错误类型:', error.name)
+      console.error('上传参数:', {
+        nickname,
+        age,
+        title,
+        fileName: originalName,
+        fileSize: fileBuffer.length,
+        mimetype
       })
-      throw new BadRequestException(error.message || '视频上传失败')
+      console.error('堆栈信息:', error.stack)
+      console.error('======================================')
+
+      // 根据错误类型提供更友好的提示
+      if (error.message?.includes('网络') || error.name?.includes('Network')) {
+        throw new BadRequestException('网络连接失败，请检查网络后重试')
+      } else if (error.message?.includes('超时') || error.name?.includes('Timeout')) {
+        throw new BadRequestException('上传超时，请检查网络后重试')
+      } else if (error.message?.includes('文件大小') || error.message?.includes('100MB')) {
+        throw new BadRequestException(error.message)
+      } else if (error.message?.includes('文件类型') || error.message?.includes('video')) {
+        throw new BadRequestException(error.message)
+      } else {
+        throw new BadRequestException(`视频上传失败：${error.message || '未知错误'}，请稍后重试`)
+      }
     }
   }
 
