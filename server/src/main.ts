@@ -35,8 +35,10 @@ async function bootstrap() {
   // 2. 解析端口
   const port = parsePort();
   try {
-    await app.listen(port);
-    console.log(`Server running on http://localhost:${port}`);
+    await app.listen(port, '0.0.0.0');
+    console.log(`Server running on http://0.0.0.0:${port}`);
+    console.log(`Local access: http://localhost:${port}`);
+    console.log(`LAN access: http://[你的局域网IP]:${port}`);
   } catch (err) {
     if (err.code === 'EADDRINUSE') {
       console.error(`❌ 端口 \({port} 被占用! 请运行 'npx kill-port \){port}' 然后重试。`);
