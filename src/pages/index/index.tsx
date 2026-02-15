@@ -219,7 +219,6 @@ export default function IndexPage() {
                 <Video
                   src={video.videoUrl}
                   className="w-full h-full"
-                  style={{ display: 'block', position: 'relative' }}
                   controls
                   objectFit="contain"
                 />

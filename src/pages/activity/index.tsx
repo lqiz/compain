@@ -1,4 +1,4 @@
-import { View, Text, Button } from '@tarojs/components'
+import { View, Text } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState } from 'react'
 import { checkLogin, hasCheckedInToday, dailyCheckin, getUserPoints, getCheckinDays } from '@/utils/auth'
@@ -84,13 +84,14 @@ const ActivityPage = () => {
               <Text className="block text-white font-semibold text-sm">已签到</Text>
             </View>
           ) : (
-            <Button
+            <View
+              className="bg-white rounded-full px-5 py-2"
               onClick={handleCheckin}
-              disabled={isCheckingIn}
-              className="bg-white text-sky-600 font-semibold rounded-full px-5 py-2 text-sm border-2 border-white"
             >
-              {isCheckingIn ? '签到中...' : '立即签到'}
-            </Button>
+              <Text className="block text-sky-600 font-semibold text-sm">
+                {isCheckingIn ? '签到中...' : '立即签到'}
+              </Text>
+            </View>
           )}
         </View>
 
