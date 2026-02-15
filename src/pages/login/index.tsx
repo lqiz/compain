@@ -36,9 +36,10 @@ const LoginPage = () => {
 
   // 处理昵称输入
   const handleNicknameInput = (e: any) => {
+    const value = e?.detail?.value || ''
     setFormData(prev => ({
       ...prev,
-      nickname: e.detail.value
+      nickname: value
     }))
   }
 

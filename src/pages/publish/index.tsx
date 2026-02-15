@@ -423,9 +423,11 @@ const PublishPage = () => {
                 placeholder="分享你的心里话，想说什么就说什么..."
                 placeholderClass="text-gray-400"
                 value={content}
-                onInput={(e) => setContent(e.detail.value)}
+                onInput={(e) => {
+                  const value = e?.detail?.value || ''
+                  setContent(value)
+                }}
                 maxlength={500}
-                autoHeight={false}
               />
               <View className="flex justify-end flex-shrink-0">
                 <Text className="block text-gray-400 text-xs">{content.length}/500</Text>
