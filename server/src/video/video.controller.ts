@@ -2,6 +2,7 @@ import { Controller, Post, Get, UseInterceptors, UploadedFile, Body, BadRequestE
 import { FileInterceptor } from '@nestjs/platform-express'
 import { memoryStorage } from 'multer'
 import { VideoService } from './video.service'
+import { CompositionService } from './composition.service'
 import { LLMClient, Config } from 'coze-coding-dev-sdk'
 
 // 定义视频数据接口，避免与 Taro 的 Video 组件冲突
@@ -17,7 +18,10 @@ interface VideoItem {
 
 @Controller('video')
 export class VideoController {
-  constructor(private readonly videoService: VideoService) {}
+  constructor(
+    private readonly videoService: VideoService,
+    private readonly compositionService: CompositionService
+  ) {}
 
   /**
    * 上传视频接口
@@ -273,6 +277,61 @@ export class VideoController {
       code: 200,
       msg: 'success',
       data: videos
+    }
+  }
+
+  /**
+   * 获取所有合成视频列表
+   * GET /api/video/composed/list
+   */
+  @Get('composed/list')
+  async getComposedVideos() {
+    console.log('收到合成视频列表请求')
+
+    const composedList = await this.compositionService.getAllComposedVideos()
+
+    return {
+      code: 200,
+      msg: 'success',
+      data: composedList
+    }
+  }
+
+  /**
+   * 获取包含指定用户视频的合成列表
+   * GET /api/video/composed/my?nickname=小明同学
+   */
+  @Get('composed/my')
+  async getUserComposedVideos(@Query('nickname') nickname: string) {
+    console.log('收到用户合成视频请求, nickname:', nickname)
+
+    if (!nickname) {
+      throw new BadRequestException('用户昵称不能为空')
+    }
+
+    const composedList = await this.compositionService.getUserComposedVideos(nickname)
+
+    return {
+      code: 200,
+      msg: 'success',
+      data: composedList
+    }
+  }
+
+  /**
+   * 手动触发合成（用于测试）
+   * POST /api/video/composed/trigger
+   */
+  @Post('composed/trigger')
+  async triggerComposition() {
+    console.log('收到手动触发合成请求')
+
+    const result = await this.compositionService.triggerManualComposition()
+
+    return {
+      code: result.success ? 200 : 400,
+      msg: result.message,
+      data: result.compositions || []
     }
   }
 

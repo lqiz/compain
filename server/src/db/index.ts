@@ -79,6 +79,24 @@ const initDb = async () => {
         created_at INTEGER NOT NULL
       )
     `)
+
+    // 合成视频表
+    sqlJsDb.run(`
+      CREATE TABLE IF NOT EXISTS composed_videos (
+        id TEXT PRIMARY KEY,
+        session_date TEXT NOT NULL,
+        session_hour INTEGER NOT NULL,
+        round_number INTEGER NOT NULL,
+        video_ids TEXT NOT NULL,
+        video_nicknames TEXT NOT NULL,
+        video_urls TEXT NOT NULL,
+        video_contents TEXT NOT NULL,
+        llm_evaluation TEXT NOT NULL,
+        total_videos INTEGER NOT NULL,
+        status TEXT NOT NULL DEFAULT 'completed',
+        created_at INTEGER NOT NULL
+      )
+    `)
     console.log('数据库表检查完成')
 
     // 创建 drizzle 实例
@@ -139,5 +157,5 @@ export const saveDatabase = () => {
 // 导出数据库实例和 schema
 export default db
 export { schema }
-export { videos }
-export type { Video, NewVideo } from './schema'
+export { videos, composedVideos } from './schema'
+export type { Video, NewVideo, ComposedVideo, NewComposedVideo } from './schema'
