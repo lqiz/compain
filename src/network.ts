@@ -14,16 +14,26 @@ export namespace Network {
             return url
         }
         const finalUrl = `${PROJECT_DOMAIN}${url}`
-        console.log('[Network] URL:', finalUrl)
+        // 安全的日志方式，避免 undefined 错误
+        try {
+            console.log('[Network] URL:', finalUrl)
+        } catch (e) {
+            // 忽略日志错误
+        }
         return finalUrl
     }
 
     export const request: typeof Taro.request = option => {
-        console.log('[Network] Request:', {
-            url: option.url,
-            method: option.method,
-            data: option.data
-        })
+        // 安全的日志方式
+        try {
+            console.log('[Network] Request:', {
+                url: option.url,
+                method: option.method || 'GET',
+                hasData: !!option.data
+            })
+        } catch (e) {
+            // 忽略日志错误
+        }
 
         const promise = Taro.request({
             ...option,
@@ -31,28 +41,41 @@ export namespace Network {
         })
 
         promise.then(res => {
-            console.log('[Network] Response:', {
-                url: option.url,
-                statusCode: res.statusCode,
-                data: res.data
-            })
+            try {
+                console.log('[Network] Response:', {
+                    url: option.url,
+                    statusCode: res.statusCode,
+                    hasData: !!res.data
+                })
+            } catch (e) {
+                // 忽略日志错误
+            }
         }).catch(err => {
-            console.error('[Network] Error:', {
-                url: option.url,
-                error: err
-            })
+            try {
+                console.error('[Network] Error:', {
+                    url: option.url,
+                    errorMsg: err?.errMsg || err?.message || 'Unknown error'
+                })
+            } catch (e) {
+                // 忽略日志错误
+            }
         })
 
         return promise
     }
 
     export const uploadFile: typeof Taro.uploadFile = option => {
-        console.log('[Network] UploadFile:', {
-            url: option.url,
-            filePath: option.filePath,
-            name: option.name,
-            formData: option.formData
-        })
+        // 安全的日志方式
+        try {
+            console.log('[Network] UploadFile:', {
+                url: option.url,
+                hasFilePath: !!option.filePath,
+                name: option.name,
+                hasFormData: !!option.formData
+            })
+        } catch (e) {
+            // 忽略日志错误
+        }
 
         const promise = Taro.uploadFile({
             ...option,
@@ -60,25 +83,38 @@ export namespace Network {
         })
 
         promise.then(res => {
-            console.log('[Network] UploadFile Response:', {
-                url: option.url,
-                statusCode: res.statusCode,
-                data: res.data
-            })
+            try {
+                console.log('[Network] UploadFile Response:', {
+                    url: option.url,
+                    statusCode: res.statusCode,
+                    hasData: !!res.data
+                })
+            } catch (e) {
+                // 忽略日志错误
+            }
         }).catch(err => {
-            console.error('[Network] UploadFile Error:', {
-                url: option.url,
-                error: err
-            })
+            try {
+                console.error('[Network] UploadFile Error:', {
+                    url: option.url,
+                    errorMsg: err?.errMsg || err?.message || 'Unknown error'
+                })
+            } catch (e) {
+                // 忽略日志错误
+            }
         })
 
         return promise
     }
 
     export const downloadFile: typeof Taro.downloadFile = option => {
-        console.log('[Network] DownloadFile:', {
-            url: option.url
-        })
+        // 安全的日志方式
+        try {
+            console.log('[Network] DownloadFile:', {
+                url: option.url
+            })
+        } catch (e) {
+            // 忽略日志错误
+        }
 
         const promise = Taro.downloadFile({
             ...option,
@@ -86,16 +122,24 @@ export namespace Network {
         })
 
         promise.then(res => {
-            console.log('[Network] DownloadFile Response:', {
-                url: option.url,
-                statusCode: res.statusCode,
-                tempFilePath: res.tempFilePath
-            })
+            try {
+                console.log('[Network] DownloadFile Response:', {
+                    url: option.url,
+                    statusCode: res.statusCode,
+                    hasTempFilePath: !!res.tempFilePath
+                })
+            } catch (e) {
+                // 忽略日志错误
+            }
         }).catch(err => {
-            console.error('[Network] DownloadFile Error:', {
-                url: option.url,
-                error: err
-            })
+            try {
+                console.error('[Network] DownloadFile Error:', {
+                    url: option.url,
+                    errorMsg: err?.errMsg || err?.message || 'Unknown error'
+                })
+            } catch (e) {
+                // 忽略日志错误
+            }
         })
 
         return promise
