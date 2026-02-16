@@ -1,0 +1,7 @@
+[build]
+  # 构建命令
+  cmd = "pnpm build:server"
+
+[start]
+  # 启动命令
+  cmd = "node server/dist/main.js"
