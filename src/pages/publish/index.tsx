@@ -9,6 +9,7 @@ const PublishPage = () => {
   const [videoDuration, setVideoDuration] = useState<number>(0)
   const [videoSize, setVideoSize] = useState<number>(0) // 新增：存储视频文件大小
   const [content, setContent] = useState<string>('')
+  const [textInput, setTextInput] = useState<string>('')
   const [uploading, setUploading] = useState<boolean>(false)
   const [uploadProgress, setUploadProgress] = useState<number>(0)
 
@@ -422,9 +423,16 @@ const PublishPage = () => {
                 className="w-full bg-transparent text-gray-800 placeholder-gray-400 text-sm flex-1 min-h-0"
                 placeholder="分享你的心里话，想说什么就说什么..."
                 placeholderClass="text-gray-400"
-                value={content}
-                onInput={(e) => {
-                  const value = e?.detail?.value || ''
+                value={textInput}
+                onInput={(e: any) => {
+                  let value = ''
+                  try {
+                    value = e?.detail?.value || ''
+                  } catch (err) {
+                    console.error('获取输入值失败:', err)
+                    value = textInput
+                  }
+                  setTextInput(value)
                   setContent(value)
                 }}
                 maxlength={500}

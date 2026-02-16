@@ -13,6 +13,7 @@ const LoginPage = () => {
     nickname: '',
     age: 10
   })
+  const [nicknameInput, setNicknameInput] = useState<string>('')
 
   // 生成随机昵称
   const generateNickname = () => {
@@ -32,11 +33,19 @@ const LoginPage = () => {
       ...prev,
       nickname: generated
     }))
+    setNicknameInput(generated)
   }, [])
 
   // 处理昵称输入
   const handleNicknameInput = (e: any) => {
-    const value = e?.detail?.value || ''
+    let value = ''
+    try {
+      value = e?.detail?.value || ''
+    } catch (err) {
+      console.error('获取输入值失败:', err)
+      value = nicknameInput
+    }
+    setNicknameInput(value)
     setFormData(prev => ({
       ...prev,
       nickname: value
@@ -114,7 +123,7 @@ const LoginPage = () => {
               <Input
                 className="w-full bg-transparent text-base"
                 placeholder="请输入昵称"
-                value={formData.nickname}
+                value={nicknameInput}
                 onInput={handleNicknameInput}
               />
             </View>
