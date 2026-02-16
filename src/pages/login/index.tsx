@@ -1,6 +1,6 @@
 import { View, Text, Input } from '@tarojs/components'
 import Taro from '@tarojs/taro'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { saveUserInfo } from '@/utils/auth'
 
 interface LoginFormData {
@@ -16,7 +16,7 @@ const LoginPage = () => {
   const [nicknameInput, setNicknameInput] = useState<string>('')
 
   // 生成随机昵称
-  const generateNickname = () => {
+  const generateNickname = useCallback(() => {
     const adjectives = ['快乐的', '可爱的', '聪明的', '勇敢的', '活泼的']
     const animals = ['小猫', '小狗', '小兔子', '小松鼠', '小鸭子']
 
@@ -24,7 +24,7 @@ const LoginPage = () => {
     const randomAnimal = animals[Math.floor(Math.random() * animals.length)]
 
     return randomAdj + randomAnimal
-  }
+  }, [])
 
   // 初始化时生成昵称
   useEffect(() => {
@@ -34,10 +34,10 @@ const LoginPage = () => {
       nickname: generated
     }))
     setNicknameInput(generated)
-  }, [])
+  }, [generateNickname])
 
   // 处理昵称输入
-  const handleNicknameInput = (e: any) => {
+  const handleNicknameInput = useCallback((e: any) => {
     let value = ''
     try {
       value = e?.detail?.value || ''
@@ -50,18 +50,18 @@ const LoginPage = () => {
       ...prev,
       nickname: value
     }))
-  }
+  }, [nicknameInput])
 
   // 处理年龄选择
-  const handleAgeChange = (age: number) => {
+  const handleAgeChange = useCallback((age: number) => {
     setFormData(prev => ({
       ...prev,
       age
     }))
-  }
+  }, [])
 
   // 处理登录
-  const handleLogin = () => {
+  const handleLogin = useCallback(() => {
     // 验证输入
     if (!formData.nickname.trim()) {
       Taro.showToast({
@@ -93,16 +93,20 @@ const LoginPage = () => {
         url: '/pages/index/index'
       })
     }, 1000)
-  }
+  }, [formData.nickname, formData.age])
 
   // 重新生成昵称
-  const handleRegenerateNickname = () => {
+  const handleRegenerateNickname = useCallback(() => {
     const generated = generateNickname()
     setFormData(prev => ({
       ...prev,
       nickname: generated
     }))
-  }
+    setNicknameInput(generated)
+  }, [generateNickname])
+
+  // 稳定的 Input value
+  const inputValue = useMemo(() => nicknameInput || '', [nicknameInput])
 
   return (
     <View className="h-screen bg-gradient-to-br from-sky-50 via-pink-50 to-orange-50 flex flex-col">
@@ -123,7 +127,7 @@ const LoginPage = () => {
               <Input
                 className="w-full bg-transparent text-base"
                 placeholder="请输入昵称"
-                value={nicknameInput}
+                value={inputValue}
                 onInput={handleNicknameInput}
               />
             </View>

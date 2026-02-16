@@ -1,6 +1,6 @@
 import { View, Text, Video, Textarea } from '@tarojs/components'
 import Taro from '@tarojs/taro'
-import { useState } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { Network } from '@/network'
 import { getUserNickname, getUserAge, addUserPoints, POINTS_RULES } from '@/utils/auth'
 
@@ -12,6 +12,9 @@ const PublishPage = () => {
   const [textInput, setTextInput] = useState<string>('')
   const [uploading, setUploading] = useState<boolean>(false)
   const [uploadProgress, setUploadProgress] = useState<number>(0)
+
+  // 稳定的 Textarea value
+  const textareaValue = useMemo(() => textInput || '', [textInput])
 
   // 页面加载时验证登录状态
   Taro.useLoad(() => {
@@ -423,8 +426,8 @@ const PublishPage = () => {
                 className="w-full bg-transparent text-gray-800 placeholder-gray-400 text-sm flex-1 min-h-0"
                 placeholder="分享你的心里话，想说什么就说什么..."
                 placeholderClass="text-gray-400"
-                value={textInput}
-                onInput={(e: any) => {
+                value={textareaValue}
+                onInput={useCallback((e: any) => {
                   let value = ''
                   try {
                     value = e?.detail?.value || ''
@@ -434,7 +437,7 @@ const PublishPage = () => {
                   }
                   setTextInput(value)
                   setContent(value)
-                }}
+                }, [textInput])}
                 maxlength={500}
               />
               <View className="flex justify-end flex-shrink-0">
