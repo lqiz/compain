@@ -1,12 +1,11 @@
 import { View, Text } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState } from 'react'
-import { checkLogin, hasCheckedInToday, dailyCheckin, getUserPoints, getCheckinDays } from '@/utils/auth'
+import { checkLogin, hasCheckedInToday, dailyCheckin, getCheckinDays } from '@/utils/auth'
 
 const ActivityPage = () => {
   const [hasCheckedIn, setHasCheckedIn] = useState(false)
   const [checkinDays, setCheckinDays] = useState(0)
-  const [points, setPoints] = useState(0)
   const [isCheckingIn, setIsCheckingIn] = useState(false)
 
   // 页面加载时检查登录状态和签到状态
@@ -29,7 +28,6 @@ const ActivityPage = () => {
   const loadCheckinStatus = () => {
     setHasCheckedIn(hasCheckedInToday())
     setCheckinDays(getCheckinDays())
-    setPoints(getUserPoints())
   }
 
   const handleCheckin = () => {
@@ -100,17 +98,6 @@ const ActivityPage = () => {
           <Text className="block text-white text-sm">
             🔥 每日签到可获得 +5 积分，积分可升级获得更多特权
           </Text>
-        </View>
-      </View>
-
-      {/* 积分统计 */}
-      <View className="bg-white border-2 border-sky-200 rounded-2xl p-5 shadow-sm mb-6">
-        <Text className="block text-gray-800 font-semibold text-base mb-4">
-          💎 我的积分
-        </Text>
-        <View className="flex items-center justify-center py-4">
-          <Text className="block text-4xl font-bold text-sky-500">{points}</Text>
-          <Text className="block text-gray-500 text-sm ml-2">积分</Text>
         </View>
       </View>
 
