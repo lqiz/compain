@@ -92,20 +92,20 @@ const PublishPage = () => {
         }
       }
 
-      // 检查文件大小限制（100MB）- 暂时禁用以排查问题
-      // const MAX_FILE_SIZE = 100 * 1024 * 1024
-      // if (fileSize > MAX_FILE_SIZE) {
-      //   const sizeInMB = Math.round(fileSize / 1024 / 1024)
-      //   Taro.showModal({
-      //     title: '视频文件过大',
-      //     content: `您选择的视频大小为 ${sizeInMB}MB，超过了 100MB 的限制。\n\n建议：\n• 选择时长更短的视频（建议 30 秒以内）\n• 使用手机自带的视频编辑功能压缩后再上传`,
-      //     showCancel: false,
-      //     confirmText: '我知道了'
-      //   })
-      //   return
-      // }
+      // 检查文件大小限制（50MB）
+      const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
+      if (fileSize > MAX_FILE_SIZE) {
+        const sizeInMB = Math.round(fileSize / 1024 / 1024)
+        Taro.showModal({
+          title: '视频文件过大',
+          content: `您选择的视频大小为 ${sizeInMB}MB，超过了 50MB 的限制。\n\n建议：\n• 选择时长更短的视频（建议 30 秒以内）\n• 使用手机自带的视频编辑功能压缩后再上传`,
+          showCancel: false,
+          confirmText: '我知道了'
+        })
+        return
+      }
 
-      console.log('文件大小检查通过（暂时禁用）:', fileSize / 1024 / 1024, 'MB')
+      console.log('文件大小检查通过:', fileSize / 1024 / 1024, 'MB')
 
       // 直接设置视频路径，不再跳转到编辑器
       setVideoPath(res.tempFilePath)
@@ -191,13 +191,20 @@ const PublishPage = () => {
         }
       }
 
-      // 检查文件大小限制（100MB）- 暂时禁用以排查问题
-      // const MAX_FILE_SIZE = 100 * 1024 * 1024
-      // if (fileSize > MAX_FILE_SIZE) {
-      //   throw new Error(`视频文件过大（${Math.round(fileSize / 1024 / 1024)}MB），请选择100MB以内的视频`)
-      // }
+      // 检查文件大小限制（降低到 50MB，避免 Zeabur 超时）
+      const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
+      if (fileSize > MAX_FILE_SIZE) {
+        const sizeInMB = Math.round(fileSize / 1024 / 1024)
+        Taro.showModal({
+          title: '视频文件过大',
+          content: `您选择的视频大小为 ${sizeInMB}MB，超过了 50MB 的限制。\n\n建议：\n• 选择时长更短的视频（建议 30 秒以内）\n• 使用手机自带的视频编辑功能压缩后再上传`,
+          showCancel: false,
+          confirmText: '我知道了'
+        })
+        throw new Error(`视频文件过大（${sizeInMB}MB），请选择 50MB 以内的视频`)
+      }
 
-      console.log('文件大小检查通过（暂时禁用）:', fileSize / 1024 / 1024, 'MB')
+      console.log('文件大小检查通过:', fileSize / 1024 / 1024, 'MB')
 
       // 根据文件大小动态计算超时时间（最少300秒 = 5分钟，每MB增加5秒）
       const fileSizeInMB = fileSize / 1024 / 1024
@@ -215,13 +222,13 @@ const PublishPage = () => {
         })
       }, 500) // 改为500ms，更慢
 
-      // H5 环境下使用完整 URL，小程序使用相对路径
-      // 将 ENV_TYPE 转换为字符串进行比较
-      const envStr = env.toString()
-      const isH5 = envStr === 'h5' || envStr === 'web'
-      const uploadUrl = isH5 ? 'http://localhost:3000/api/video/upload' : '/api/video/upload'
+// 根据环境获取上传 URL
+      const uploadUrl = (process.env.PROJECT_DOMAIN && process.env.PROJECT_DOMAIN !== 'undefined')
+        ? `${process.env.PROJECT_DOMAIN}/api/video/upload`
+        : '/api/video/upload'
 
       console.log('上传URL:', uploadUrl)
+      console.log('PROJECT_DOMAIN:', process.env.PROJECT_DOMAIN)
 
       // 添加超时处理 - 使用动态超时时间
       const timeoutPromise = new Promise((_, reject) => {
@@ -378,7 +385,7 @@ const PublishPage = () => {
                 <View className="flex flex-col items-center">
                   <Text className="block text-4xl mb-2">📹</Text>
                   <Text className="block text-gray-800 font-semibold text-sm mb-1">选择视频</Text>
-                  <Text className="block text-gray-500 text-xs">支持 MP4 格式，最大 100MB</Text>
+                  <Text className="block text-gray-500 text-xs">支持 MP4 格式，最大 50MB</Text>
                 </View>
               </View>
             ) : (
