@@ -1,0 +1,39 @@
+{
+  "$schema": "https://framework-1258016615.tcloudbaseapp.com/schema/management/v2/tcb.json",
+  "version": "2.0",
+  "envId": "",
+  "services": [
+    {
+      "name": "backend",
+      "containerPort": 3000,
+      "cpu": 0.5,
+      "mem": 1.0,
+      "minReplicas": 1,
+      "maxReplicas": 3,
+      "containerPort": 3000,
+      "envVariables": [
+        {
+          "key": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "key": "PORT",
+          "value": "3000"
+        },
+        {
+          "key": "COZE_BUCKET_ENDPOINT_URL",
+          "value": ""
+        },
+        {
+          "key": "COZE_BUCKET_NAME",
+          "value": ""
+        }
+      ],
+      "dockerfile": "Dockerfile",
+      "volumeMounts": [],
+      "customLogs": "",
+      "initialDelaySeconds": 10,
+      "protocol": "http"
+    }
+  ]
+}
