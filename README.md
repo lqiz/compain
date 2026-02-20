@@ -197,6 +197,42 @@ export default definePageConfig({
   enablePullDownRefresh: true,
   backgroundTextStyle: 'dark',
 })
+
+## 🚀 后端部署到 Zeabur
+
+详细的后端部署指南请查看：[ZEABUR_DEPLOYMENT_GUIDE.md](./ZEABUR_DEPLOYMENT_GUIDE.md)
+
+### 快速部署
+
+1. **推送代码到 GitHub**
+   ```bash
+   git add .
+   git commit -m "feat: 准备后端部署"
+   git push origin main
+   ```
+
+2. **在 Zeabur 导入项目**
+   - 访问：https://zeabur.com
+   - 使用 GitHub 登录
+   - 选择你的仓库：`lqiz/compain`
+   - 点击「Import」
+
+3. **创建后端服务**
+   - 选择「Dockerfile」
+   - 配置环境变量：
+     - `COZE_BUCKET_ENDPOINT_URL`: `https://s3.coze.cn`
+     - `COZE_BUCKET_NAME`: `your-bucket-name`（替换为实际值）
+   - 点击「Deploy」
+
+4. **获取服务地址**
+   - 在 Zeabur 中复制生成的域名（如：`https://backend.abc123.zeabur.app`）
+   - 在前端 `.env` 中配置 `PROJECT_DOMAIN=https://backend.abc123.zeabur.app`
+
+5. **配置微信小程序域名**
+   - 在微信公众平台配置服务器域名
+   - 添加 Zeabur 域名到合法域名列表
+
+**详细步骤请查看：[ZEABUR_DEPLOYMENT_GUIDE.md](./ZEABUR_DEPLOYMENT_GUIDE.md)**
 ```
 
 #### 应用配置
