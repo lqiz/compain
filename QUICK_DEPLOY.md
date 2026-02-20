@@ -88,7 +88,7 @@ zeabur deploy
 1. 找到或创建 `.env` 文件
 2. 添加以下内容：
    ```bash
-   PROJECT_DOMAIN=https://backend.abc123.zeabur.app
+   PROJECT_DOMAIN=https://compain.preview.aliyun-zeabur.cn
    ```
 3. 保存并重新编译
 
@@ -100,9 +100,9 @@ zeabur deploy
 4. 点击 **「修改」**
 5. 添加以下域名：
    ```
-   request合法域名: https://backend.abc123.zeabur.app
-   uploadFile合法域名: https://backend.abc123.zeabur.app
-   downloadFile合法域名: https://backend.abc123.zeabur.app
+   request合法域名: https://compain.preview.aliyun-zeabur.cn
+   uploadFile合法域名: https://compain.preview.aliyun-zeabur.cn
+   downloadFile合法域名: https://compain.preview.aliyun-zeabur.cn
    ```
 6. 点击 **「保存并提交」**
 

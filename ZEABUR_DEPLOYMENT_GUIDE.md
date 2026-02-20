@@ -123,8 +123,8 @@ git push -u origin main
 3. 添加以下内容：
 
 ```bash
-# Zeabur 后端地址（替换为步骤 6 中获取的实际域名）
-PROJECT_DOMAIN=https://backend.abc123.zeabur.app
+# Zeabur 后端地址
+PROJECT_DOMAIN=https://compain.preview.aliyun-zeabur.cn
 ```
 
 4. 保存文件
@@ -141,12 +141,12 @@ PROJECT_DOMAIN=https://backend.abc123.zeabur.app
 3. 左侧菜单：**「开发」** → **「开发管理」** → **「开发设置」**
 4. 找到 **「服务器域名」** 部分
 5. 点击 **「修改」**
-6. 添加以下域名（替换为你的实际域名）：
+6. 添加以下域名：
 
 ```
-request合法域名: https://backend.abc123.zeabur.app
-uploadFile合法域名: https://backend.abc123.zeabur.app
-downloadFile合法域名: https://backend.abc123.zeabur.app
+request合法域名: https://compain.preview.aliyun-zeabur.cn
+uploadFile合法域名: https://compain.preview.aliyun-zeabur.cn
+downloadFile合法域名: https://compain.preview.aliyun-zeabur.cn
 ```
 
 7. 点击 **「保存并提交」**
@@ -161,7 +161,7 @@ downloadFile合法域名: https://backend.abc123.zeabur.app
 在浏览器中访问：
 
 ```
-https://backend.abc123.zeabur.app/api/health
+https://compain.preview.aliyun-zeabur.cn/api/health
 ```
 
 **预期返回**：
@@ -174,6 +174,11 @@ https://backend.abc123.zeabur.app/api/health
 ```
 
 如果看到这个响应，说明后端部署成功！🎉
+
+**⚠️ 如果无法访问**：
+1. 检查域名是否正确：`compain.preview.aliyun-zeabur.cn`
+2. 检查是否需要加上 `https://`
+3. 确认后端服务是否在运行中
 
 ---
 

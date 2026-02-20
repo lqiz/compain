@@ -225,8 +225,8 @@ export default definePageConfig({
    - 点击「Deploy」
 
 4. **获取服务地址**
-   - 在 Zeabur 中复制生成的域名（如：`https://backend.abc123.zeabur.app`）
-   - 在前端 `.env` 中配置 `PROJECT_DOMAIN=https://backend.abc123.zeabur.app`
+   - 在 Zeabur 中复制生成的域名（如：`https://compain.preview.aliyun-zeabur.cn`）
+   - 在前端 `.env` 中配置 `PROJECT_DOMAIN=https://compain.preview.aliyun-zeabur.cn`
 
 5. **配置微信小程序域名**
    - 在微信公众平台配置服务器域名
